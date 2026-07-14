@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_mask_door_front_left.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/mask_door_front_left.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_ic_volume_up.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ic_volume_up.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_mask_door_rear_right.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/mask_door_rear_right.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_van_chassis_base.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/van_chassis_base.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_mask_door_rear_left.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/mask_door_rear_left.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/xml_device_filter.xml.flat",
+        "source": "com.van.status.app-main-46:/xml/device_filter.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_ic_volume_off.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ic_volume_off.xml"
+    },
+    {
+        "merged": "com.van.status.app-merged_res-44:/drawable_mask_door_front_right.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/mask_door_front_right.xml"
+    }
+]

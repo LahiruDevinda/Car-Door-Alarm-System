@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="400dp"
+    android:viewportWidth="800"
+    android:viewportHeight="400">
+
+    <!-- Rear Left Door Slid Back Panel -->
+    <path
+        android:fillColor="#FF0000"
+        android:fillAlpha="0.2"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2.5"
+        android:pathData="M 525,98 H 660 V 106 H 525 Z" />
+
+    <!-- Rear Left Door Opening Highlight -->
+    <path
+        android:strokeColor="#FF0000"
+        android:strokeWidth="3.5"
+        android:pathData="M 390,110 L 525,110" />
+
+</vector>

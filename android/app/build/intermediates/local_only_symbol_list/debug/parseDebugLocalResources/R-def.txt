@@ -1,0 +1,21 @@
+R_DEF: Internal format may change without notice
+local
+drawable back_open
+drawable base
+drawable front_left_closed
+drawable front_left_open
+drawable front_right_open
+drawable ic_thermometer
+drawable ic_volume_off
+drawable ic_volume_up
+drawable iso_3d_door_fl
+drawable iso_3d_door_fr
+drawable iso_3d_door_rl
+drawable iso_3d_door_rr
+drawable rear_left_closed
+drawable rear_left_open
+drawable ui_circular_dial
+drawable ui_perspective_grid
+drawable van_isometric_chassis_base
+drawable van_top_view_dark
+xml device_filter

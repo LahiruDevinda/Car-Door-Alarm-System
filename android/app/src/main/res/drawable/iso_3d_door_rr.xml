@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="576dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="576">
+
+    <!-- Tailgate/Back Door Swing Panel in 3D Perspective -->
+    <path
+        android:fillColor="#FF0000"
+        android:fillAlpha="0.20"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2.5"
+        android:pathData="M 615,105 L 770,75 C 775,73 782,75 785,78 L 810,110 L 680,140 Z" />
+
+    <!-- Back Door Frame / opening highlight -->
+    <path
+        android:strokeColor="#FF0000"
+        android:strokeWidth="3.5"
+        android:pathData="M 615,105 L 680,140 L 680,260 L 615,220 Z" />
+
+</vector>

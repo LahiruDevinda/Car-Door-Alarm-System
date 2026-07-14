@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="576dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="576">
+
+    <!-- Vanishing Point Center: (512, 288) -->
+    <!-- Radiating Perspective Lines -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:pathData="M 512,288 L 0,576
+                          M 512,288 L 170,576
+                          M 512,288 L 340,576
+                          M 512,288 L 512,576
+                          M 512,288 L 684,576
+                          M 512,288 L 854,576
+                          M 512,288 L 1024,576" />
+
+    <!-- Radiating Side Perspective Lines -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:pathData="M 512,288 L 0,380
+                          M 512,288 L 0,470
+                          M 512,288 L 1024,380
+                          M 512,288 L 1024,470" />
+
+    <!-- Horizontal Floor Grid Lines (Logarithmic Spacing for depth) -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:pathData="M 256,432 L 768,432
+                          M 192,468 L 832,468
+                          M 115,512 L 909,512
+                          M 0,564 L 1024,564" />
+
+</vector>

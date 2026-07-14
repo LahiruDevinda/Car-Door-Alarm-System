@@ -1,0 +1,209 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.van.status"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.USB_PERMISSION" />
+11-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:4:5-73
+11-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:4:22-70
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+12-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:5:5-77
+12-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:5:22-74
+13    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+13-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:6:5-94
+13-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:6:22-91
+14    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+14-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:7:5-79
+14-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:7:22-76
+15    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+15-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:8:5-78
+15-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:8:22-75
+16    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+16-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:9:5-81
+16-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:9:22-78
+17
+18    <uses-feature android:name="android.hardware.usb.host" />
+18-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:11:5-62
+18-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:11:19-59
+19
+20    <permission
+20-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+21        android:name="com.van.status.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+21-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+22        android:protectionLevel="signature" />
+22-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+23
+24    <uses-permission android:name="com.van.status.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+24-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+24-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+25
+26    <application
+26-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:13:5-55:19
+27        android:allowBackup="true"
+27-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:14:9-35
+28        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+28-->[androidx.core:core:1.12.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\d1923a4e60e379ebebf6dc74b958334f\workspace\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+29        android:debuggable="true"
+30        android:extractNativeLibs="false"
+31        android:icon="@android:drawable/sym_def_app_icon"
+31-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:15:9-58
+32        android:label="Van Door Telemetry"
+32-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:16:9-43
+33        android:roundIcon="@android:drawable/sym_def_app_icon"
+33-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:17:9-63
+34        android:supportsRtl="true"
+34-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:18:9-35
+35        android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
+35-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:19:9-71
+36        <activity
+36-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:21:9-38:20
+37            android:name="com.van.status.MainActivity"
+37-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:22:13-41
+38            android:exported="true"
+38-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:23:13-36
+39            android:launchMode="singleTop"
+39-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:24:13-43
+40            android:screenOrientation="landscape"
+40-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:25:13-50
+41            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
+41-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:26:13-75
+42            <intent-filter>
+42-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:27:13-30:29
+43                <action android:name="android.intent.action.MAIN" />
+43-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:28:17-69
+43-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:28:25-66
+44
+45                <category android:name="android.intent.category.LAUNCHER" />
+45-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:29:17-77
+45-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:29:27-74
+46            </intent-filter>
+47            <intent-filter>
+47-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:32:13-34:29
+48                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+48-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:33:17-90
+48-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:33:25-87
+49            </intent-filter>
+50
+51            <meta-data
+51-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:35:13-37:57
+52                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+52-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:36:17-79
+53                android:resource="@xml/device_filter" />
+53-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:37:17-54
+54        </activity>
+55
+56        <service
+56-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:40:9-43:40
+57            android:name="com.van.status.UsbBackgroundService"
+57-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:41:13-49
+58            android:exported="false"
+58-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:43:13-37
+59            android:foregroundServiceType="connectedDevice" />
+59-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:42:13-60
+60
+61        <receiver
+61-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:45:9-53:20
+62            android:name="com.van.status.BootReceiver"
+62-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:46:13-41
+63            android:enabled="true"
+63-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:47:13-35
+64            android:exported="true" >
+64-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:48:13-36
+65            <intent-filter android:priority="999" >
+65-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:49:13-52:29
+65-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:49:28-50
+66                <action android:name="android.intent.action.BOOT_COMPLETED" />
+66-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:50:17-79
+66-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:50:25-76
+67                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+67-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:51:17-86
+67-->C:\Users\lap.lk\Desktop\se-awurudu-potral\android\app\src\main\AndroidManifest.xml:51:25-83
+68            </intent-filter>
+69        </receiver>
+70
+71        <activity
+71-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\960bf1452923ffe1e86dcf6c7b3d4899\workspace\transformed\jetified-ui-test-manifest-1.5.0\AndroidManifest.xml:23:9-25:39
+72            android:name="androidx.activity.ComponentActivity"
+72-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\960bf1452923ffe1e86dcf6c7b3d4899\workspace\transformed\jetified-ui-test-manifest-1.5.0\AndroidManifest.xml:24:13-63
+73            android:exported="true" />
+73-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\960bf1452923ffe1e86dcf6c7b3d4899\workspace\transformed\jetified-ui-test-manifest-1.5.0\AndroidManifest.xml:25:13-36
+74        <activity
+74-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\26dd6a66ea87c9e59dcc3b647c2d1249\workspace\transformed\jetified-ui-tooling-release\AndroidManifest.xml:23:9-25:39
+75            android:name="androidx.compose.ui.tooling.PreviewActivity"
+75-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\26dd6a66ea87c9e59dcc3b647c2d1249\workspace\transformed\jetified-ui-tooling-release\AndroidManifest.xml:24:13-71
+76            android:exported="true" />
+76-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\26dd6a66ea87c9e59dcc3b647c2d1249\workspace\transformed\jetified-ui-tooling-release\AndroidManifest.xml:25:13-36
+77
+78        <provider
+78-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+79            android:name="androidx.startup.InitializationProvider"
+79-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:25:13-67
+80            android:authorities="com.van.status.androidx-startup"
+80-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:26:13-68
+81            android:exported="false" >
+81-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:27:13-37
+82            <meta-data
+82-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+83                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+83-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:30:17-75
+84                android:value="androidx.startup" />
+84-->[androidx.emoji2:emoji2:1.4.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\02c1e59e5290055fee44d7bee0d7b8b2\workspace\transformed\jetified-emoji2-1.4.0\AndroidManifest.xml:31:17-49
+85            <meta-data
+85-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\27147410c55ffe5bb2f08cd99429297c\workspace\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+86                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+86-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\27147410c55ffe5bb2f08cd99429297c\workspace\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+87                android:value="androidx.startup" />
+87-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\27147410c55ffe5bb2f08cd99429297c\workspace\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+88            <meta-data
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+89                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+90                android:value="androidx.startup" />
+90-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+91        </provider>
+92
+93        <receiver
+93-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+94            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+94-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+95            android:directBootAware="false"
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+96            android:enabled="true"
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+97            android:exported="true"
+97-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+98            android:permission="android.permission.DUMP" >
+98-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+99            <intent-filter>
+99-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+100                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+100-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+100-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+101            </intent-filter>
+102            <intent-filter>
+102-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+103                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+103-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+103-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+104            </intent-filter>
+105            <intent-filter>
+105-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+106                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+107            </intent-filter>
+108            <intent-filter>
+108-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+109                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\lap.lk\.gradle\caches\9.2.1\transforms\24ee84803e4a226c33b8c156903db13e\workspace\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+110            </intent-filter>
+111        </receiver>
+112    </application>
+113
+114</manifest>

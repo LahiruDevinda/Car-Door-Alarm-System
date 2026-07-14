@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="400dp"
+    android:viewportWidth="800"
+    android:viewportHeight="400">
+
+    <!-- Front Left Door Swing Panel (20% alpha red fill, 100% alpha red stroke) -->
+    <path
+        android:fillColor="#FF0000"
+        android:fillAlpha="0.2"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2.5"
+        android:pathData="M 265,110 L 355,45 C 357,47 359,50 360,52 L 270,115 Z" />
+
+    <!-- Front Left Door Opening Highlight (where the door was closed) -->
+    <path
+        android:strokeColor="#FF0000"
+        android:strokeWidth="3.5"
+        android:pathData="M 265,110 L 375,110" />
+
+</vector>

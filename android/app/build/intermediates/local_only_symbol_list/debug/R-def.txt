@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_volume_off
+drawable ic_volume_up
+drawable mask_door_front_left
+drawable mask_door_front_right
+drawable mask_door_rear_left
+drawable mask_door_rear_right
+drawable van_chassis_base
+xml device_filter

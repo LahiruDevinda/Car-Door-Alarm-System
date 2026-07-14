@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="576dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="576">
+
+    <!-- Subtle Circular Telemetry Track (Centered for 1024x576) -->
+    <path
+        android:strokeColor="#1F64748B"
+        android:strokeWidth="1.5"
+        android:pathData="M 512,68 A 220,220 0 1,1 512,508 A 220,220 0 1,1 512,68" />
+
+</vector>

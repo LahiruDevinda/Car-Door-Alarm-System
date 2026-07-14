@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="576dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="576">
+
+    <!-- Front Left Door Swing Panel in 3D Perspective -->
+    <path
+        android:fillColor="#FF0000"
+        android:fillAlpha="0.20"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2.5"
+        android:pathData="M 325,310 L 280,410 C 278,415 278,425 280,430 L 295,440 L 330,345 Z" />
+
+    <!-- Front Left Door Opening Highlight -->
+    <path
+        android:strokeColor="#FF0000"
+        android:strokeWidth="3.5"
+        android:pathData="M 325,310 L 330,345" />
+
+</vector>

@@ -1,0 +1,99 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="400dp"
+    android:viewportWidth="800"
+    android:viewportHeight="400">
+
+    <!-- Van Body Outline -->
+    <path
+        android:strokeColor="#475569"
+        android:strokeWidth="2.5"
+        android:pathData="M 160,200 C 160,170 170,140 200,125 C 220,115 240,110 270,110 L 630,110 C 645,110 655,120 658,135 L 660,200 L 658,265 C 655,280 645,290 630,290 L 270,290 C 240,290 220,285 200,275 C 170,260 160,230 160,200 Z" />
+
+    <!-- Front Bumper Line -->
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2"
+        android:pathData="M 162,185 C 160,195 160,205 162,215" />
+
+    <!-- Windshield -->
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2.5"
+        android:pathData="M 255,120 C 240,150 240,250 255,280" />
+
+    <!-- Windshield Top Edge / Sun Visor line -->
+    <path
+        android:strokeColor="#475569"
+        android:strokeWidth="1.5"
+        android:pathData="M 265,120 C 252,150 252,250 265,280" />
+
+    <!-- Front Hood Panel Lines -->
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2"
+        android:pathData="M 210,135 C 195,155 195,245 210,265" />
+
+    <!-- Front Grill Details -->
+    <path
+        android:strokeColor="#475569"
+        android:strokeWidth="1.5"
+        android:pathData="M 172,165 C 168,180 168,220 172,235" />
+
+    <!-- Rear Window -->
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2.5"
+        android:pathData="M 645,125 C 648,150 648,250 645,275" />
+
+    <!-- Side Mirrors (Left & Right) -->
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2"
+        android:pathData="M 245,109 L 230,95 L 235,92 L 252,109" />
+    <path
+        android:strokeColor="#64748B"
+        android:strokeWidth="2"
+        android:pathData="M 245,291 L 230,305 L 235,308 L 252,291" />
+
+    <!-- Driver & Passenger Front Seats (Outline) -->
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:pathData="M 285,122 H 315 V 157 H 285 Z" />
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:pathData="M 285,243 H 315 V 278 H 285 Z" />
+
+    <!-- Middle Row Seats (Outline) -->
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:pathData="M 405,122 H 435 V 157 H 405 Z" />
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:pathData="M 405,243 H 435 V 278 H 405 Z" />
+
+    <!-- Rear Row Bench Seat (Outline) -->
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:pathData="M 535,122 H 565 V 278 H 535 Z" />
+
+    <!-- Wheels (Front Left, Front Right, Rear Left, Rear Right) -->
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M 235,95 H 275 V 108 H 235 Z" />
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M 235,292 H 275 V 305 H 235 Z" />
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M 560,95 H 600 V 108 H 560 Z" />
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M 560,292 H 600 V 305 H 560 Z" />
+
+</vector>

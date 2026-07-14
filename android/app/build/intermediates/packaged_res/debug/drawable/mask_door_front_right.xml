@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="400dp"
+    android:viewportWidth="800"
+    android:viewportHeight="400">
+
+    <!-- Front Right Door Swing Panel -->
+    <path
+        android:fillColor="#FF0000"
+        android:fillAlpha="0.2"
+        android:strokeColor="#FF0000"
+        android:strokeWidth="2.5"
+        android:pathData="M 265,290 L 355,355 C 357,353 359,350 360,348 L 270,285 Z" />
+
+    <!-- Front Right Door Opening Highlight -->
+    <path
+        android:strokeColor="#FF0000"
+        android:strokeWidth="3.5"
+        android:pathData="M 265,290 L 375,290" />
+
+</vector>
