@@ -180,6 +180,14 @@ layout notification_template_custom_big
 layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
+raw alert_chime_1
+raw alert_chime_2
+raw alert_chime_3
+raw alert_chime_4
+raw alert_chime_four
+raw audi_chime
+raw chime_three
+raw chime_two
 string androidx_startup
 string bottom_sheet_collapse_description
 string bottom_sheet_dismiss_description

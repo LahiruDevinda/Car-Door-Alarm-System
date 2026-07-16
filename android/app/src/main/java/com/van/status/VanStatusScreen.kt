@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -36,7 +38,8 @@ fun VanStatusScreen(
     isRrOpen: Boolean,
     cabinTemperature: Int,
     isBuzzerEnabled: Boolean,
-    onToggleBuzzer: () -> Unit
+    onToggleBuzzer: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "Blinking Alert Animations")
     
@@ -452,6 +455,23 @@ fun VanStatusScreen(
                     id = if (isBuzzerEnabled) R.drawable.ic_volume_up else R.drawable.ic_volume_off
                 ),
                 contentDescription = "Toggle Audio Warnings",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        // Floating Top-Left Corner Settings Button
+        IconButton(
+            onClick = onNavigateToSettings,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(24.dp)
+                .background(Color(0x13FFFFFF), shape = CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "System Settings",
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )

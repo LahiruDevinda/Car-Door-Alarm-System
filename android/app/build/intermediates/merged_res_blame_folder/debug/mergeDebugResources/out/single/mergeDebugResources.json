@@ -1,122 +1,110 @@
 [
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_mask_door_back_open.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\mask_door_back_open.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_iso_3d_door_fr.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/iso_3d_door_fr.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_3d_door_rl.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_3d_door_rl.xml"
+        "merged": "com.van.status.app-debug-44:/raw_alert_chime_1.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/alert_chime_1.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_van_top_view_dark.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\van_top_view_dark.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_ui_circular_dial.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ui_circular_dial.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_mask_door_rl.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_mask_door_rl.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_van_isometric_chassis_base.jpg.flat",
+        "source": "com.van.status.app-main-46:/drawable/van_isometric_chassis_base.jpg"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_van_3d_open.jpg.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\van_3d_open.jpg"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_rear_left_open.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/rear_left_open.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_3d_door_fr.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_3d_door_fr.xml"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_front_right_open.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/front_right_open.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_mask_door_fr.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_mask_door_fr.xml"
+        "merged": "com.van.status.app-debug-44:/raw_alert_chime_4.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/alert_chime_4.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_mask_door_rr.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_mask_door_rr.xml"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_base.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/base.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_front_left_open.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\front_left_open.png"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_front_left_open.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/front_left_open.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_van_3d_closed.jpg.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\van_3d_closed.jpg"
+        "merged": "com.van.status.app-debug-44:/drawable_iso_3d_door_rr.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/iso_3d_door_rr.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_mask_door_rr_open.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\mask_door_rr_open.xml"
+        "merged": "com.van.status.app-debug-44:/raw_chime_two.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/chime_two.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_rear_left_open.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\rear_left_open.png"
+        "merged": "com.van.status.app-debug-44:/drawable_ui_perspective_grid.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ui_perspective_grid.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\xml_device_filter.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\xml\\device_filter.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_ic_volume_off.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ic_volume_off.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_mask_door_fr_open.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\mask_door_fr_open.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_van_top_view_dark.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/van_top_view_dark.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_ic_volume_up.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\ic_volume_up.xml"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_front_left_closed.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/front_left_closed.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_3d_door_fl.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_3d_door_fl.xml"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_back_open.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/back_open.png"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_ui_circular_dial.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\ui_circular_dial.xml"
+        "merged": "com.van.status.app-debug-44:/raw_chime_three.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/chime_three.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_back_open.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\back_open.png"
+        "merged": "com.van.status.app-debug-44:/raw_alert_chime_four.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/alert_chime_four.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_front_right_open.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\front_right_open.png"
+        "merged": "com.van.status.app-debug-44:/raw_alert_chime_2.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/alert_chime_2.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_van_isometric_chassis_base.jpg.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\van_isometric_chassis_base.jpg"
+        "merged": "com.van.status.app-debug-44:/raw_alert_chime_3.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/alert_chime_3.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_ui_perspective_grid.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\ui_perspective_grid.xml"
-    },
-    {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_mask_door_fl_open.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\mask_door_fl_open.xml"
-    },
-    {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_3d_door_rr.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_3d_door_rr.xml"
-    },
-    {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_base.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\base.png"
+        "merged": "com.van.status.app-debug-44:/drawable-nodpi_rear_left_closed.png.flat",
+        "source": "com.van.status.app-main-46:/drawable-nodpi/rear_left_closed.png"
     },
     {
         "merged": "com.van.status.app-debug-44:/drawable_ic_thermometer.xml.flat",
         "source": "com.van.status.app-main-46:/drawable/ic_thermometer.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_rear_left_closed.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\rear_left_closed.png"
+        "merged": "com.van.status.app-debug-44:/xml_device_filter.xml.flat",
+        "source": "com.van.status.app-main-46:/xml/device_filter.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_mask_door_rl_open.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\mask_door_rl_open.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_iso_3d_door_rl.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/iso_3d_door_rl.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_iso_mask_door_fl.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\iso_mask_door_fl.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_iso_3d_door_fl.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/iso_3d_door_fl.xml"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable-nodpi_front_left_closed.png.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable-nodpi\\front_left_closed.png"
+        "merged": "com.van.status.app-debug-44:/raw_audi_chime.mp3.flat",
+        "source": "com.van.status.app-main-46:/raw/audi_chime.mp3"
     },
     {
-        "merged": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-debug-44:\\drawable_ic_volume_off.xml.flat",
-        "source": "C:\\Users\\lap.lk\\.gradle\\daemon\\9.2.1\\com.van.status.app-main-46:\\drawable\\ic_volume_off.xml"
+        "merged": "com.van.status.app-debug-44:/drawable_ic_volume_up.xml.flat",
+        "source": "com.van.status.app-main-46:/drawable/ic_volume_up.xml"
     }
 ]

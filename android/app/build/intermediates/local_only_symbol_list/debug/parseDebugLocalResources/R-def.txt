@@ -18,4 +18,12 @@ drawable ui_circular_dial
 drawable ui_perspective_grid
 drawable van_isometric_chassis_base
 drawable van_top_view_dark
+raw alert_chime_1
+raw alert_chime_2
+raw alert_chime_3
+raw alert_chime_4
+raw alert_chime_four
+raw audi_chime
+raw chime_three
+raw chime_two
 xml device_filter

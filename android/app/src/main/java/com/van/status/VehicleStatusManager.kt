@@ -20,8 +20,12 @@ object VehicleStatusManager {
     private val _isBuzzerEnabled = MutableStateFlow(true)
     val isBuzzerEnabled: StateFlow<Boolean> = _isBuzzerEnabled.asStateFlow()
 
-    private val _cabinTemperature = MutableStateFlow(24) // Default cabin temperature
+    private val _cabinTemperature = MutableStateFlow(24)
     val cabinTemperature: StateFlow<Int> = _cabinTemperature.asStateFlow()
+
+    // Diagnostic console logs
+    private val _diagnosticLogs = MutableStateFlow<List<String>>(emptyList())
+    val diagnosticLogs: StateFlow<List<String>> = _diagnosticLogs.asStateFlow()
 
     fun updateDoorState(door: String, isOpen: Boolean) {
         when (door.uppercase().trim()) {
@@ -38,5 +42,18 @@ object VehicleStatusManager {
 
     fun setBuzzerEnabled(enabled: Boolean) {
         _isBuzzerEnabled.value = enabled
+    }
+
+    fun addDiagnosticLog(log: String) {
+        val current = _diagnosticLogs.value.toMutableList()
+        current.add(log)
+        if (current.size > 100) {
+            current.removeAt(0)
+        }
+        _diagnosticLogs.value = current
+    }
+
+    fun clearDiagnosticLogs() {
+        _diagnosticLogs.value = emptyList()
     }
 }

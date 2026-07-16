@@ -12,12 +12,19 @@ import android.content.pm.ServiceInfo
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import java.io.IOException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class UsbBackgroundService : Service() {
 
@@ -25,7 +32,6 @@ class UsbBackgroundService : Service() {
         private const val NOTIFICATION_CHANNEL_ID = "VanTelemetryServiceChannel"
         private const val NOTIFICATION_ID = 1001
         private const val ACTION_USB_PERMISSION = "com.van.status.USB_PERMISSION"
-        // Intent filter identifier for simulation testing streams
         private const val ACTION_SIMULATE_TELEMETRY = "com.van.status.SIMULATE_TELEMETRY"
     }
 
@@ -34,17 +40,22 @@ class UsbBackgroundService : Service() {
     private var isReaderRunning = false
     private var readerThread: Thread? = null
 
+    // Track whether the application is currently active due to an alert foreground trigger
+    private var isAppBroughtToFront = false
+
+    // Scope for observing telemetry and playing warning audio chimes
+    private val serviceScope = CoroutineScope(Dispatchers.Main)
+    private var alarmPlayer: MediaPlayer? = null
+
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                // --- SIMULATION TESTING DATA INTERCEPTOR ---
                 ACTION_SIMULATE_TELEMETRY -> {
                     val rawSimData = intent.getStringExtra("DATA_STREAM")
                     if (!rawSimData.isNullOrEmpty()) {
                         handleSerialLine(rawSimData.trim())
                     }
                 }
-
                 ACTION_USB_PERMISSION -> {
                     synchronized(this) {
                         val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -92,15 +103,43 @@ class UsbBackgroundService : Service() {
             addAction(ACTION_USB_PERMISSION)
             addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
-            // Listen for the diagnostic testing channel
             addAction(ACTION_SIMULATE_TELEMETRY)
         }
 
-        // Export the receiver explicitly so outside laptop ADB environments can interact with it
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(usbReceiver, filter, RECEIVER_EXPORTED)
-        } else {
-            registerReceiver(usbReceiver, filter)
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            usbReceiver,
+            filter,
+            androidx.core.content.ContextCompat.RECEIVER_EXPORTED
+        )
+
+        // Start reactive warning chime loop observer
+        serviceScope.launch {
+            combine(
+                VehicleStatusManager.isFlOpen,
+                VehicleStatusManager.isFrOpen,
+                VehicleStatusManager.isRlOpen,
+                VehicleStatusManager.isBackOpen,
+                VehicleStatusManager.isBuzzerEnabled
+            ) { fl, fr, rl, back, buzzer ->
+                val prefs = getSharedPreferences("van_prefs", Context.MODE_PRIVATE)
+                val flEnabled = prefs.getBoolean("pref_fl_enabled", true)
+                val frEnabled = prefs.getBoolean("pref_fr_enabled", true)
+                val rlEnabled = prefs.getBoolean("pref_rl_enabled", true)
+                val backEnabled = prefs.getBoolean("pref_back_enabled", true)
+
+                val isAnyActiveDoorOpen = (fl && flEnabled) ||
+                                          (fr && frEnabled) ||
+                                          (rl && rlEnabled) ||
+                                          (back && backEnabled)
+                isAnyActiveDoorOpen && buzzer
+            }.collect { shouldPlay ->
+                if (shouldPlay) {
+                    startAlarmChime()
+                } else {
+                    stopAlarmChime()
+                }
+            }
         }
 
         scanAndConnect()
@@ -116,6 +155,41 @@ class UsbBackgroundService : Service() {
         super.onDestroy()
         unregisterReceiver(usbReceiver)
         disconnect()
+        serviceScope.cancel()
+        stopAlarmChime()
+    }
+
+    private fun startAlarmChime() {
+        if (alarmPlayer != null) return // Already playing warning loop
+
+        val prefs = getSharedPreferences("van_prefs", Context.MODE_PRIVATE)
+        val chimeSelection = prefs.getString("pref_chime_selection", "audi_chime") ?: "audi_chime"
+        val resId = when (chimeSelection) {
+            "audi_chime" -> R.raw.audi_chime
+            "chime_two" -> R.raw.chime_two
+            "chime_three" -> R.raw.chime_three
+            "chime_four" -> R.raw.alert_chime_four
+            else -> R.raw.audi_chime
+        }
+
+        try {
+            alarmPlayer = MediaPlayer.create(this, resId).apply {
+                isLooping = true
+                start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopAlarmChime() {
+        try {
+            alarmPlayer?.stop()
+            alarmPlayer?.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        alarmPlayer = null
     }
 
     private fun createNotificationChannel() {
@@ -178,7 +252,7 @@ class UsbBackgroundService : Service() {
         val permissionIntent = PendingIntent.getBroadcast(
             this,
             0,
-            Intent(ACTION_USB_PERMISSION),
+            Intent(ACTION_USB_PERMISSION).setPackage(packageName),
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         manager.requestPermission(device, permissionIntent)
@@ -195,12 +269,10 @@ class UsbBackgroundService : Service() {
             port.open(connection)
             port.setParameters(9600, UsbSerialPort.DATABITS_8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
             
-            // Enable DTR & RTS lines (Critical for Arduino serial communication)
             try {
                 port.setDTR(true)
                 port.setRTS(true)
             } catch (ignored: Exception) {
-                // Fallback for devices without line control support
             }
 
             usbSerialPort = port
@@ -248,18 +320,32 @@ class UsbBackgroundService : Service() {
     }
 
     private fun handleSerialLine(line: String) {
-        // Strip backslashes, single quotes, and double quotes added by terminal shells
+        // Broadcast raw incoming frame to UI thread for IPC logging
+        try {
+            val intent = Intent("com.van.status.UPDATE_UI_LOGS").apply {
+                putExtra("LOG_LINE", line)
+            }
+            sendBroadcast(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         val sanitizedLine = line.replace("\\", "")
                                 .replace("'", "")
                                 .replace("\"", "")
                                 .trim()
 
-        // Strip the DATA_STREAM: prefix if present
         val payload = if (sanitizedLine.startsWith("DATA_STREAM:")) {
             sanitizedLine.substringAfter("DATA_STREAM:")
         } else {
             sanitizedLine
         }
+
+        val prefs = getSharedPreferences("van_prefs", Context.MODE_PRIVATE)
+        val flEnabled = prefs.getBoolean("pref_fl_enabled", true)
+        val frEnabled = prefs.getBoolean("pref_fr_enabled", true)
+        val rlEnabled = prefs.getBoolean("pref_rl_enabled", true)
+        val backEnabled = prefs.getBoolean("pref_back_enabled", true)
 
         val tokens = payload.split("|")
         for (token in tokens) {
@@ -276,13 +362,64 @@ class UsbBackgroundService : Service() {
                     val door = parts[0]
                     val state = parts[1]
                     val isOpen = state.uppercase().trim() == "OPEN"
-                    VehicleStatusManager.updateDoorState(door, isOpen)
+                    
+                    val doorCleaned = door.uppercase().trim()
+                    val isAllowed = when (doorCleaned) {
+                        "FL" -> flEnabled
+                        "FR" -> frEnabled
+                        "RL" -> rlEnabled
+                        "BACK", "RR" -> backEnabled
+                        else -> true
+                    }
+
+                    if (isAllowed) {
+                        val wasOpen = when (doorCleaned) {
+                            "FL" -> VehicleStatusManager.isFlOpen.value
+                            "FR" -> VehicleStatusManager.isFrOpen.value
+                            "RL" -> VehicleStatusManager.isRlOpen.value
+                            "BACK", "RR" -> VehicleStatusManager.isBackOpen.value
+                            else -> false
+                        }
+
+                        // Display Wake-Up: triggers when an allowed entry point transitions to OPEN
+                        if (isOpen && !wasOpen) {
+                            triggerHardwareDisplayWakeUp()
+                        }
+
+                        VehicleStatusManager.updateDoorState(doorCleaned, isOpen)
+                    }
                 }
             }
         }
 
-        if (sanitizedLine.uppercase().contains("OPEN")) {
+        val isAnyActiveDoorOpen = (flEnabled && VehicleStatusManager.isFlOpen.value) ||
+                                  (frEnabled && VehicleStatusManager.isFrOpen.value) ||
+                                  (rlEnabled && VehicleStatusManager.isRlOpen.value) ||
+                                  (backEnabled && VehicleStatusManager.isBackOpen.value)
+
+        if (isAnyActiveDoorOpen) {
             bringMainActivityToFront()
+            isAppBroughtToFront = true
+        } else {
+            // Auto-Close: shut down app task stack when all active doors transition back to closed
+            if (isAppBroughtToFront) {
+                isAppBroughtToFront = false
+                val closeIntent = Intent("com.van.status.AUTO_CLOSE_APP")
+                sendBroadcast(closeIntent)
+            }
+        }
+    }
+
+    private fun triggerHardwareDisplayWakeUp() {
+        try {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val wl = powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "VanStatus:DisplayWakeLock"
+            )
+            wl.acquire(5000) // Wakes screen for 5 seconds
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
