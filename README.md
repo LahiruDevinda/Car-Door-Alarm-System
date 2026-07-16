@@ -1,35 +1,30 @@
-# 🚐 Smart Van Telemetry Dashboard System
+# Van Status Monitor 🚌💨
 
-An integrated hardware-software ecosystem designed to monitor real-time vehicle entry points and internal cabin climate metrics. The project pairs an **Arduino Nano** capturing negative-switching vehicle hardware logic with a **Jetpack Compose Android Foreground Service application** optimized for Android Car Players (Head Units) and mobile devices.
-
----
-
-## ✨ Features
-
-* 📱 **Automated Background Wakeup:** The Android background service automatically monitors serial ports, instantly bringing the UI overlay to the screen foreground if a door is opened.
-* 🔄 **Native Appliance Lifecycle (Boot Launch):** Features an integrated `BootReceiver` that hooks into `BOOT_COMPLETED` system intents, automatically launching the telemetry service as soon as the vehicle's Android Car Player powers on.
-* ⏳ **5-Second Intelligent Dismissal:** When all entry points return to a closed state, a non-blocking coroutine gracefully counts down for 5 seconds before minimizing the application to conserve system memory and battery health.
-* 📊 **Glassmorphic Cyber-Wireframe UI:** Renders structural isometric alert animations with real-time blinking aura sweeps (`BlendMode.Screen`) when a door state violation is active.
-* 🌡️ **Smooth Numerical Rolling Gauge:** Leverages a localized `animateIntAsState` tween configuration to smoothly count temperature metrics up or down one-by-one, removing dry numerical interface snapping.
-* 🎛️ **Dashboard Illumination Over-USB Controller:** Integrates an interactive UI slider sending PWM signals back down the data cable to a logic-level MOSFET, allowing the driver to dim or brighten physical 12V dashboard cluster lights from the application screen.
-* ⚡ **Zero-Converter USB Powered:** Engineered to operate completely using the stable 5V output of a standard Android Head Unit USB port, eliminating the need for complex buck-boost voltage regulators.
+An advanced, real-time Android vehicle telemetry dashboard designed to interface with onboard microcontrollers over a direct physical USB-to-Serial connection. Built entirely with modern Android patterns, Kotlin, Jetpack Compose, and asynchronous Coroutines.
 
 ---
 
-## 🛠️ System Architecture
+## 🚀 Key Features Built Today
 
-### 1. Hardware Pinout Configuration
-* **Digital Pin 2 (`INPUT_PULLUP`):** Front Left (FL) Door Switch Line
-* **Digital Pin 3 (`INPUT_PULLUP`):** Front Right (FR) Door Switch Line
-* **Digital Pin 4 (`INPUT_PULLUP`):** Rear Left (RL) Door Switch Line
-* **Digital Pin 5 (`INPUT_PULLUP`):** Back Hatch (BACK) Door Switch Line
-* **Digital Pin 6 (`PWM Output`):** IRLZ44N MOSFET Gate (12V Dashboard Illumination Control)
-* **Analog Pin A1:** LM35DZ Ambient Air Temperature Sensor
+### 📡 Process-Isolated Architecture & IPC Log Bridge
+* **Cross-Process Bus:** Bypasses Android's process isolation boundaries. Telemetry gathered by the background thread (`UsbBackgroundService`) safely hops the memory divide via an internal intent bus (`"com.van.status.UPDATE_UI_LOGS"`) to feed the frontend interface instance.
+* **Modern Security Alignment:** Fully compliant with Android 11+ up to Android 14+ (API 34). Implements strict conditional runtime flags using `Context.RECEIVER_NOT_EXPORTED` to protect internal UI logs from external system sniffing while keeping simulation lines open for ADB diagnostics.
 
-### 2. Stream Data Transmission Protocol
-To ensure maximum text parsing resilience against data truncation or loop delays, the microcontroller uses an **Atomic Line-by-Line Streaming Framework** running over a 9600 Baud link payload profile. Data packets stream out as single strings ended by a standard newline literal (`\n`):
+### 🔐 Lock-Screen Overrides & Automation Engine
+* **Intelligent Display Activation:** Uses a combination of hardware `PowerManager.WakeLock` and advanced windowing flags (`setShowWhenLocked`, `setTurnScreenOn`) to automatically wake up a black screen and float the app interface directly over the device lock screen when an alert triggers.
+* **Bypass Security Restrictions:** Restricts navigation to the core **Settings Screen** and **Developer Mode** when the app is active over a locked keyguard, ensuring third parties cannot modify parameters without the owner's authorization.
+* **Auto-Tardown & Re-Lock:** The moment the incoming data stream reports that all active entry points are safely closed, the app explicitly strips its wake flags and calls `finishAndRemoveTask()`, closing the layout and forcing the OS to immediately lock the display back down.
+
+### 🎵 Stateful Chime Profiling & Settings Matrix
+* **4-Track Telemetry Audio:** Integrates four custom warning chime tracks (`audi_chime`, `chime_two`, `chime_three`, and `alert_chime_4`) housed directly in the application's physical binary paths (`res/raw/`).
+* **Interactive UI Preview Engine:** Choosing an audio profile within the settings panel updates the typography font colors and transforms row item vector properties from a dynamic Play arrow to a Stop icon instantly during manual previews.
+* **Hot-Reload Sync Layer:** Committing channel filter toggles (`flEnabled`, `frEnabled`, etc.) instantly updates shared device configurations on the fly and broadcasts a reload signal to the background execution thread without forcing data mutation side-effects.
+
+---
+
+## 🛠️ Data Ingestion Matrix (Serial Token Spec)
+The parsing subsystem processes raw telemetry strings using pipeline separation parameters. Data arriving via the USB UART driver or simulated ADB shell pipes must match this explicit string design signature:
 
 ```text
-DATA_STREAM:FL_OPEN
-DATA_STREAM:FR_CLOSED
+DATA_STREAM:FL_OPEN|FR_CLOSED|RL_CLOSED|BACK_CLOSED|TEMP:24
 DATA_STREAM:TEMP:27
