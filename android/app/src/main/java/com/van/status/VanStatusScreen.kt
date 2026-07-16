@@ -130,23 +130,28 @@ fun VanStatusScreen(
         ))
     }
 
-    // Red Glow Matrix: White background -> Black, dark lines -> Pure Red
-    val redGlowMatrix = remember {
+    val alertColor = MaterialTheme.colorScheme.error
+    val redVal = alertColor.red * 255f
+    val greenVal = alertColor.green * 255f
+    val blueVal = alertColor.blue * 255f
+
+    // Red Glow Matrix: White background -> Black, dark lines -> Dynamic Alert Color
+    val redGlowMatrix = remember(alertColor) {
         ColorMatrix(floatArrayOf(
-            -1f,  0f,  0f, 0f, 255f, // Red
-             0f,  0f,  0f, 0f,   0f, // Green
-             0f,  0f,  0f, 0f,   0f, // Blue
+            -1f,  0f,  0f, 0f, redVal, // Red
+             0f,  0f,  0f, 0f, greenVal, // Green
+             0f,  0f,  0f, 0f, blueVal, // Blue
              0f,  0f,  0f, 1f,   0f  // Alpha
         ))
     }
 
-    // Crimson Mesh Matrix: White background -> Black, dark lines -> Crimson (0xFFEF4444)
-    val crimsonMeshMatrix = remember {
+    // Crimson Mesh Matrix: White background -> Black, dark lines -> Dynamic Alert Color
+    val crimsonMeshMatrix = remember(alertColor) {
         ColorMatrix(floatArrayOf(
-            -0.937f,  0f,  0f, 0f, 239f, // Red (239)
-              0f,    0f,  0f, 0f,  68f, // Green (68)
-              0f,    0f,  0f, 0f,  68f, // Blue (68)
-              0f,    0f,  0f, 1f,   0f  // Alpha
+            -(redVal / 255f),  0f,  0f, 0f, redVal,
+              0f,             0f,  0f, 0f, greenVal,
+              0f,             0f,  0f, 0f, blueVal,
+              0f,             0f,  0f, 1f,   0f
         ))
     }
 
@@ -164,7 +169,7 @@ fun VanStatusScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFF1E293B), Color(0xFF09090B))
+                    colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.background)
                 )
             ) // Minimal slate gray to absolute black gradient core directly behind the van
     ) {
@@ -429,7 +434,7 @@ fun VanStatusScreen(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_thermometer),
                     contentDescription = "Cabin Temperature",
-                    tint = Color(0xFFEF4444),
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
@@ -481,12 +486,22 @@ fun VanStatusScreen(
 
 @Composable
 fun VanStatusTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = darkColorScheme(
-            primary = Color(0xFF38BDF8),
-            background = Color(0xFF0D0D0D),
-            surface = Color(0xFF1E293B)
-        ),
-        content = content
-    )
+    val themeIndex by VehicleStatusManager.selectedThemeIndex.collectAsState()
+    val colorScheme = if (themeIndex >= VehicleStatusManager.ThemePalettes.size) {
+        // Custom user palette
+        val primary by VehicleStatusManager.customPrimaryColor.collectAsState()
+        val alert by VehicleStatusManager.customAlertColor.collectAsState()
+        val bg by VehicleStatusManager.customBackgroundColor.collectAsState()
+        val surface by VehicleStatusManager.customSurfaceColor.collectAsState()
+        darkColorScheme(primary = primary, background = bg, surface = surface, error = alert)
+    } else {
+        val theme = VehicleStatusManager.ThemePalettes[themeIndex]
+        darkColorScheme(
+            primary = theme.primaryColor,
+            background = theme.backgroundColor,
+            surface = theme.surfaceColor,
+            error = theme.alertColor
+        )
+    }
+    MaterialTheme(colorScheme = colorScheme, content = content)
 }

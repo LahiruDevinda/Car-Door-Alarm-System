@@ -142,6 +142,14 @@ class UsbBackgroundService : Service() {
             }
         }
 
+        // Dynamically adjust MediaPlayer volume in real-time when global volume changes
+        serviceScope.launch {
+            VehicleStatusManager.globalVolume.collect { volSetting ->
+                val floatVol = volSetting / 100f
+                alarmPlayer?.setVolume(floatVol, floatVol)
+            }
+        }
+
         scanAndConnect()
     }
 
@@ -168,13 +176,15 @@ class UsbBackgroundService : Service() {
             "audi_chime" -> R.raw.audi_chime
             "chime_two" -> R.raw.chime_two
             "chime_three" -> R.raw.chime_three
-            "chime_four" -> R.raw.alert_chime_four
+            "chime_four" -> R.raw.alert_chime_4
             else -> R.raw.audi_chime
         }
 
         try {
             alarmPlayer = MediaPlayer.create(this, resId).apply {
                 isLooping = true
+                val vol = VehicleStatusManager.globalVolume.value / 100f
+                setVolume(vol, vol)
                 start()
             }
         } catch (e: Exception) {

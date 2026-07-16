@@ -82,10 +82,31 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            val context = LocalContext.current
+            val sharedPrefs = remember { context.getSharedPreferences("van_prefs", Context.MODE_PRIVATE) }
+            val keyguardManager = remember { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
+
+            LaunchedEffect(Unit) {
+                val themeIndex = sharedPrefs.getInt("pref_theme_index", 0)
+                val volume = sharedPrefs.getInt("pref_global_volume", 100)
+                VehicleStatusManager.setSelectedThemeIndex(themeIndex)
+                VehicleStatusManager.setGlobalVolume(volume)
+                // Load custom user palette colors
+                VehicleStatusManager.setCustomPrimaryColor(
+                    androidx.compose.ui.graphics.Color(sharedPrefs.getInt("custom_primary_color", 0xFF38BDF8.toInt()))
+                )
+                VehicleStatusManager.setCustomAlertColor(
+                    androidx.compose.ui.graphics.Color(sharedPrefs.getInt("custom_alert_color", 0xFFEF4444.toInt()))
+                )
+                VehicleStatusManager.setCustomBackgroundColor(
+                    androidx.compose.ui.graphics.Color(sharedPrefs.getInt("custom_bg_color", 0xFF0D0D0D.toInt()))
+                )
+                VehicleStatusManager.setCustomSurfaceColor(
+                    androidx.compose.ui.graphics.Color(sharedPrefs.getInt("custom_surface_color", 0xFF1E293B.toInt()))
+                )
+            }
+
             VanStatusTheme {
-                val context = LocalContext.current
-                val sharedPrefs = remember { context.getSharedPreferences("van_prefs", Context.MODE_PRIVATE) }
-                val keyguardManager = remember { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
 
                 // Persistent preference states
                 var flEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_fl_enabled", true)) }
