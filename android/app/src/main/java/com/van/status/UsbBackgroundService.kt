@@ -99,6 +99,10 @@ class UsbBackgroundService : Service() {
         createNotificationChannel()
         startForegroundServiceNotification()
 
+        val prefs = getSharedPreferences("van_prefs", Context.MODE_PRIVATE)
+        val initialVolume = prefs.getInt("pref_global_volume", 100)
+        VehicleStatusManager.setGlobalVolume(initialVolume)
+
         val filter = IntentFilter().apply {
             addAction(ACTION_USB_PERMISSION)
             addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
@@ -115,22 +119,36 @@ class UsbBackgroundService : Service() {
 
         // Start reactive warning chime loop observer
         serviceScope.launch {
-            combine(
-                VehicleStatusManager.isFlOpen,
-                VehicleStatusManager.isFrOpen,
-                VehicleStatusManager.isRlOpen,
-                VehicleStatusManager.isBackOpen,
-                VehicleStatusManager.isBuzzerEnabled
-            ) { fl, fr, rl, back, buzzer ->
+            combine<Any, Boolean>(
+                listOf(
+                    VehicleStatusManager.isFlOpen,
+                    VehicleStatusManager.isFrOpen,
+                    VehicleStatusManager.isRlOpen,
+                    VehicleStatusManager.isRrOpen,
+                    VehicleStatusManager.isBackOpen,
+                    VehicleStatusManager.isBuzzerEnabled,
+                    VehicleStatusManager.selectedVehicleType
+                )
+            ) { array ->
+                val fl = array[0] as Boolean
+                val fr = array[1] as Boolean
+                val rl = array[2] as Boolean
+                val rr = array[3] as Boolean
+                val back = array[4] as Boolean
+                val buzzer = array[5] as Boolean
+                val currentVehicleType = array[6] as VehicleType
+
                 val prefs = getSharedPreferences("van_prefs", Context.MODE_PRIVATE)
                 val flEnabled = prefs.getBoolean("pref_fl_enabled", true)
                 val frEnabled = prefs.getBoolean("pref_fr_enabled", true)
                 val rlEnabled = prefs.getBoolean("pref_rl_enabled", true)
+                val rrEnabled = prefs.getBoolean("pref_rr_enabled", true)
                 val backEnabled = prefs.getBoolean("pref_back_enabled", true)
 
                 val isAnyActiveDoorOpen = (fl && flEnabled) ||
                                           (fr && frEnabled) ||
                                           (rl && rlEnabled) ||
+                                          (currentVehicleType == VehicleType.SUV_5_DOOR && rr && rrEnabled) ||
                                           (back && backEnabled)
                 isAnyActiveDoorOpen && buzzer
             }.collect { shouldPlay ->
@@ -180,11 +198,14 @@ class UsbBackgroundService : Service() {
             else -> R.raw.audi_chime
         }
 
+        val currentVolume = prefs.getInt("pref_global_volume", 100)
+        VehicleStatusManager.setGlobalVolume(currentVolume)
+        val floatVolume = currentVolume / 100f
+
         try {
             alarmPlayer = MediaPlayer.create(this, resId).apply {
                 isLooping = true
-                val vol = VehicleStatusManager.globalVolume.value / 100f
-                setVolume(vol, vol)
+                setVolume(floatVolume, floatVolume)
                 start()
             }
         } catch (e: Exception) {
@@ -355,7 +376,9 @@ class UsbBackgroundService : Service() {
         val flEnabled = prefs.getBoolean("pref_fl_enabled", true)
         val frEnabled = prefs.getBoolean("pref_fr_enabled", true)
         val rlEnabled = prefs.getBoolean("pref_rl_enabled", true)
+        val rrEnabled = prefs.getBoolean("pref_rr_enabled", true)
         val backEnabled = prefs.getBoolean("pref_back_enabled", true)
+        val currentVehicleType = VehicleStatusManager.selectedVehicleType.value
 
         val tokens = payload.split("|")
         for (token in tokens) {
@@ -371,32 +394,47 @@ class UsbBackgroundService : Service() {
                 if (parts.size == 2) {
                     val door = parts[0]
                     val state = parts[1]
-                    val isOpen = state.uppercase().trim() == "OPEN"
-                    
+                    val parsedSensorState = state.uppercase().trim() == "OPEN"
                     val doorCleaned = door.uppercase().trim()
+
+                    // Apply the Telemetry Processing Override masking logic
+                    val finalIsOpen = if (doorCleaned == "RR") {
+                        if (currentVehicleType == VehicleType.VAN) {
+                            false // Permanently hardcode Rear-Right as Closed/Disabled for the Van profile
+                        } else {
+                            parsedSensorState // Read actual hardware state for the 5-Door SUV profile
+                        }
+                    } else {
+                        parsedSensorState
+                    }
+
                     val isAllowed = when (doorCleaned) {
                         "FL" -> flEnabled
                         "FR" -> frEnabled
                         "RL" -> rlEnabled
-                        "BACK", "RR" -> backEnabled
+                        "RR" -> {
+                            if (currentVehicleType == VehicleType.VAN) false else rrEnabled
+                        }
+                        "BACK" -> backEnabled
                         else -> true
                     }
 
-                    if (isAllowed) {
+                    if (isAllowed || (doorCleaned == "RR" && currentVehicleType == VehicleType.VAN)) {
                         val wasOpen = when (doorCleaned) {
                             "FL" -> VehicleStatusManager.isFlOpen.value
                             "FR" -> VehicleStatusManager.isFrOpen.value
                             "RL" -> VehicleStatusManager.isRlOpen.value
-                            "BACK", "RR" -> VehicleStatusManager.isBackOpen.value
+                            "RR" -> VehicleStatusManager.isRrOpen.value
+                            "BACK" -> VehicleStatusManager.isBackOpen.value
                             else -> false
                         }
 
                         // Display Wake-Up: triggers when an allowed entry point transitions to OPEN
-                        if (isOpen && !wasOpen) {
+                        if (finalIsOpen && !wasOpen && isAllowed) {
                             triggerHardwareDisplayWakeUp()
                         }
 
-                        VehicleStatusManager.updateDoorState(doorCleaned, isOpen)
+                        VehicleStatusManager.updateDoorState(doorCleaned, finalIsOpen)
                     }
                 }
             }
@@ -405,6 +443,7 @@ class UsbBackgroundService : Service() {
         val isAnyActiveDoorOpen = (flEnabled && VehicleStatusManager.isFlOpen.value) ||
                                   (frEnabled && VehicleStatusManager.isFrOpen.value) ||
                                   (rlEnabled && VehicleStatusManager.isRlOpen.value) ||
+                                  (currentVehicleType == VehicleType.SUV_5_DOOR && rrEnabled && VehicleStatusManager.isRrOpen.value) ||
                                   (backEnabled && VehicleStatusManager.isBackOpen.value)
 
         if (isAnyActiveDoorOpen) {

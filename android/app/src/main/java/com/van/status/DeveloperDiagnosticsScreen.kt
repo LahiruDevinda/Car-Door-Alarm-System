@@ -40,62 +40,51 @@ fun DeveloperDiagnosticsScreen(
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("van_prefs", Context.MODE_PRIVATE) }
     var activeTab by remember { mutableStateOf(0) }
-    val tabTitles = listOf("🎨 UI Theme", "⚙️ Settings", "📊 Resource Monitor")
-
+    val tabTitles = listOf("⚙️ Engineering Defaults", "🛠️ Settings", "📊 Resource Monitor")
     val listState = rememberLazyListState()
 
-    // Auto-scroll to bottom when new logs arrive in monitor tab
     LaunchedEffect(logs.size) {
-        if (logs.isNotEmpty() && activeTab == 2) {
-            listState.animateScrollToItem(logs.size - 1)
-        }
+        if (logs.isNotEmpty() && activeTab == 2) listState.animateScrollToItem(logs.size - 1)
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF09090B)) // Dark cyber black backdrop
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp)
     ) {
-        // Back Button
         IconButton(
             onClick = onBack,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .background(Color(0x13FFFFFF), shape = CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), shape = CircleShape)
                 .size(48.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back to Settings",
-                tint = Color.White
-            )
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back to Settings",
+                tint = MaterialTheme.colorScheme.primary)
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 64.dp),
+            modifier = Modifier.fillMaxSize().padding(top = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = "DEVELOPER ENGINE PORTAL",
-                color = Color(0xFF10B981),
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace
             )
 
-            // Tab Row Switcher
             TabRow(
                 selectedTabIndex = activeTab,
-                containerColor = Color(0xFF1E293B),
+                containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
-                    .background(Color(0xFF1E293B), shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.20f), RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp))
             ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
@@ -104,7 +93,7 @@ fun DeveloperDiagnosticsScreen(
                         text = {
                             Text(
                                 text = title,
-                                color = if (activeTab == index) Color(0xFF38BDF8) else Color.LightGray,
+                                color = if (activeTab == index) MaterialTheme.colorScheme.primary else Color.LightGray,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -113,21 +102,11 @@ fun DeveloperDiagnosticsScreen(
                 }
             }
 
-            // Tab Contents
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 when (activeTab) {
-                    0 -> ThemeCustomizationTab(context)
+                    0 -> EngineeringDefaultsTab(context, logs)
                     1 -> SystemSettingsTab(context)
-                    2 -> ResourceMonitorTab(
-                        logs = logs,
-                        onClearLogs = onClearLogs,
-                        listState = listState,
-                        context = context
-                    )
+                    2 -> ResourceMonitorTab(logs = logs, onClearLogs = onClearLogs, listState = listState, context = context)
                 }
             }
         }
@@ -135,102 +114,89 @@ fun DeveloperDiagnosticsScreen(
 }
 
 @Composable
-fun ThemeCustomizationTab(context: Context) {
+fun EngineeringDefaultsTab(context: Context, logs: List<String>) {
     val sharedPrefs = remember { context.getSharedPreferences("van_prefs", Context.MODE_PRIVATE) }
-    val themeIndex by VehicleStatusManager.selectedThemeIndex.collectAsState()
     val scrollState = rememberScrollState()
+    val primary = MaterialTheme.colorScheme.primary
+    val errorColor = MaterialTheme.colorScheme.error
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(Color(0xFF020617), shape = RoundedCornerShape(12.dp))
-            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(12.dp))
+            .border(1.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "PRE-DEFINED DESIGN PALETTES",
-            color = Color(0xFF38BDF8),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = "ENGINEERING SYSTEM RECOVERY", color = primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
-        VehicleStatusManager.ThemePalettes.forEachIndexed { index, palette ->
-            val isSelected = (themeIndex == index)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (isSelected) Color(0x1F38BDF8) else Color(0x05FFFFFF),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .border(
-                        1.dp,
-                        if (isSelected) Color(0xFF38BDF8) else Color.White.copy(alpha = 0.08f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .clickable {
-                        VehicleStatusManager.setSelectedThemeIndex(index)
-                        sharedPrefs.edit().putInt("pref_theme_index", index).apply()
-                    }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = palette.name,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ColorIndicator(palette.primaryColor, "Primary")
-                        ColorIndicator(palette.alertColor, "Alert")
-                        ColorIndicator(palette.backgroundColor, "BG")
-                    }
-                }
-                RadioButton(
-                    selected = isSelected,
-                    onClick = {
-                        VehicleStatusManager.setSelectedThemeIndex(index)
-                        sharedPrefs.edit().putInt("pref_theme_index", index).apply()
-                    },
-                    colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF38BDF8))
-                )
-            }
-        }
+        Text(
+            text = "Triggering a system reset will restore all color settings to default, clear door filters, and re-enable volume levels to 100%.",
+            color = Color.Gray,
+            fontSize = 12.sp
+        )
 
         Button(
             onClick = {
-                VehicleStatusManager.setSelectedThemeIndex(0)
-                sharedPrefs.edit().putInt("pref_theme_index", 0).apply()
+                VehicleStatusManager.resetAllStates()
+                sharedPrefs.edit().clear().apply()
+                // Reset developer passcode default to 1234
+                sharedPrefs.edit().putString("pref_dev_passcode", "1234").apply()
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0x13FFFFFF)),
+            colors = ButtonDefaults.buttonColors(containerColor = errorColor.copy(alpha = 0.10f)),
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(8.dp)),
+                .border(1.dp, errorColor.copy(alpha = 0.25f), RoundedCornerShape(8.dp)),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text("Reset to Defaults", color = Color.White)
+            Text("Reset to Defaults", color = errorColor, fontWeight = FontWeight.Bold)
+        }
+
+        Divider(color = Color.White.copy(alpha = 0.08f))
+
+        Text(text = "SYSTEM OVERRIDE LOGS", color = primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color.Black.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            if (logs.isEmpty()) {
+                Text(
+                    text = "No system logs active.",
+                    color = Color.Gray,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                val listState = rememberLazyListState()
+                LaunchedEffect(logs.size) {
+                    listState.animateScrollToItem(logs.size - 1)
+                }
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    items(logs) { log ->
+                        Text(
+                            text = ">>> $log",
+                            color = if (log.contains("OPEN")) errorColor else Color(0xFF34D399),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun ColorIndicator(color: Color, label: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(color, shape = CircleShape)
-                .border(0.5.dp, Color.White, CircleShape)
-        )
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Box(modifier = Modifier.size(12.dp).background(color, shape = CircleShape).border(0.5.dp, Color.White, CircleShape))
         Text(text = label, color = Color.Gray, fontSize = 10.sp)
     }
 }
@@ -240,12 +206,15 @@ fun ColorIndicator(color: Color, label: String) {
 fun SystemSettingsTab(context: Context) {
     val sharedPrefs = remember { context.getSharedPreferences("van_prefs", Context.MODE_PRIVATE) }
     val volume by VehicleStatusManager.globalVolume.collectAsState()
+    val vehicleType by VehicleStatusManager.selectedVehicleType.collectAsState()
+    val primary = MaterialTheme.colorScheme.primary
+    val errorColor = MaterialTheme.colorScheme.error
 
-    var currentPasscode by remember { mutableStateOf("") }
-    var newPasscode by remember { mutableStateOf("") }
-    var confirmPasscode by remember { mutableStateOf("") }
-    var passcodeError by remember { mutableStateOf<String?>(null) }
-    var passcodeSuccess by remember { mutableStateOf(false) }
+    var currentPasscode  by remember { mutableStateOf("") }
+    var newPasscode      by remember { mutableStateOf("") }
+    var confirmPasscode  by remember { mutableStateOf("") }
+    var passcodeError    by remember { mutableStateOf<String?>(null) }
+    var passcodeSuccess  by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
 
@@ -253,122 +222,165 @@ fun SystemSettingsTab(context: Context) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(Color(0xFF020617), shape = RoundedCornerShape(12.dp))
-            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(12.dp))
+            .border(1.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Section: Volume Control
+        // Volume Control
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                text = "GLOBAL WARNING CHIME VOLUME: $volume%",
-                color = Color(0xFF38BDF8),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "GLOBAL WARNING CHIME VOLUME: $volume%", color = primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             Slider(
                 value = volume.toFloat(),
-                onValueChange = { newValue ->
-                    VehicleStatusManager.setGlobalVolume(newValue.toInt())
-                },
-                onValueChangeFinished = {
-                    sharedPrefs.edit().putInt("pref_global_volume", volume).apply()
-                },
+                onValueChange = { VehicleStatusManager.setGlobalVolume(it.toInt()) },
+                onValueChangeFinished = { sharedPrefs.edit().putInt("pref_global_volume", volume).apply() },
                 valueRange = 0f..100f,
-                colors = SliderDefaults.colors(
-                    thumbColor = Color(0xFF38BDF8),
-                    activeTrackColor = Color(0xFF38BDF8),
-                    inactiveTrackColor = Color.Gray
-                )
+                colors = SliderDefaults.colors(thumbColor = primary, activeTrackColor = primary, inactiveTrackColor = Color.Gray)
             )
         }
 
         Divider(color = Color.White.copy(alpha = 0.08f))
 
-        // Section: Passcode Modifier
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Vehicle Profile Switcher
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(text = "VEHICLE CHASSIS PROFILE", color = primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             Text(
-                text = "DEVELOPER GATEWAY SECURITY",
-                color = Color(0xFF38BDF8),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                text = "Select the vehicle body type to bind the correct door telemetry wireframe. SUV assets will be used once added to drawable-nodpi/.",
+                color = Color.Gray,
+                fontSize = 12.sp
             )
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                // VAN option
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            if (vehicleType == VehicleType.VAN) primary.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.03f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .border(
+                            1.dp,
+                            if (vehicleType == VehicleType.VAN) primary else Color.White.copy(alpha = 0.10f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .clickable {
+                            VehicleStatusManager.setVehicleType(VehicleType.VAN)
+                            sharedPrefs.edit().putString("pref_vehicle_type", "VAN").apply()
+                        }
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    RadioButton(
+                        selected = vehicleType == VehicleType.VAN,
+                        onClick = {
+                            VehicleStatusManager.setVehicleType(VehicleType.VAN)
+                            sharedPrefs.edit().putString("pref_vehicle_type", "VAN").apply()
+                        },
+                        colors = RadioButtonDefaults.colors(selectedColor = primary)
+                    )
+                    Column {
+                        Text("Van", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("Cargo / Minivan", color = Color.Gray, fontSize = 10.sp)
+                    }
+                }
+
+                // SUV_5_DOOR option
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            if (vehicleType == VehicleType.SUV_5_DOOR) primary.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.03f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .border(
+                            1.dp,
+                            if (vehicleType == VehicleType.SUV_5_DOOR) primary else Color.White.copy(alpha = 0.10f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .clickable {
+                            VehicleStatusManager.setVehicleType(VehicleType.SUV_5_DOOR)
+                            sharedPrefs.edit().putString("pref_vehicle_type", "SUV_5_DOOR").apply()
+                        }
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    RadioButton(
+                        selected = vehicleType == VehicleType.SUV_5_DOOR,
+                        onClick = {
+                            VehicleStatusManager.setVehicleType(VehicleType.SUV_5_DOOR)
+                            sharedPrefs.edit().putString("pref_vehicle_type", "SUV_5_DOOR").apply()
+                        },
+                        colors = RadioButtonDefaults.colors(selectedColor = primary)
+                    )
+                    Column {
+                        Text("5-Door SUV", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("Assets pending", color = Color.Gray, fontSize = 10.sp)
+                    }
+                }
+            }
+        }
+
+        Divider(color = Color.White.copy(alpha = 0.08f))
+
+        // Passcode Section
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(text = "DEVELOPER GATEWAY SECURITY", color = primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
             OutlinedTextField(
                 value = currentPasscode,
-                onValueChange = {
-                    currentPasscode = it
-                    passcodeError = null
-                    passcodeSuccess = false
-                },
+                onValueChange = { currentPasscode = it; passcodeError = null; passcodeSuccess = false },
                 label = { Text("Current Passcode") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF38BDF8), focusedLabelColor = Color(0xFF38BDF8))
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = primary, focusedLabelColor = primary)
             )
-
             OutlinedTextField(
                 value = newPasscode,
-                onValueChange = {
-                    newPasscode = it
-                    passcodeError = null
-                    passcodeSuccess = false
-                },
+                onValueChange = { newPasscode = it; passcodeError = null; passcodeSuccess = false },
                 label = { Text("New Passcode (4-Digits)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF38BDF8), focusedLabelColor = Color(0xFF38BDF8))
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = primary, focusedLabelColor = primary)
             )
-
             OutlinedTextField(
                 value = confirmPasscode,
-                onValueChange = {
-                    confirmPasscode = it
-                    passcodeError = null
-                    passcodeSuccess = false
-                },
+                onValueChange = { confirmPasscode = it; passcodeError = null; passcodeSuccess = false },
                 label = { Text("Confirm New Passcode") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF38BDF8), focusedLabelColor = Color(0xFF38BDF8))
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = primary, focusedLabelColor = primary)
             )
 
-            if (passcodeError != null) {
-                Text(text = passcodeError!!, color = Color(0xFFEF4444), fontSize = 12.sp)
-            }
-            if (passcodeSuccess) {
-                Text(text = "Passcode updated successfully!", color = Color(0xFF10B981), fontSize = 12.sp)
-            }
+            if (passcodeError != null) Text(text = passcodeError!!, color = errorColor, fontSize = 12.sp)
+            if (passcodeSuccess) Text(text = "Passcode updated successfully!", color = Color(0xFF10B981), fontSize = 12.sp)
 
             Button(
                 onClick = {
-                    val savedPasscode = sharedPrefs.getString("pref_dev_passcode", "1234") ?: "1234"
-                    if (currentPasscode != savedPasscode) {
-                        passcodeError = "Current passcode is incorrect."
-                    } else if (newPasscode.length != 4 || newPasscode.any { !it.isDigit() }) {
-                        passcodeError = "New passcode must be exactly 4 digits."
-                    } else if (newPasscode != confirmPasscode) {
-                        passcodeError = "New passcodes do not match."
-                    } else {
-                        sharedPrefs.edit().putString("pref_dev_passcode", newPasscode).apply()
-                        currentPasscode = ""
-                        newPasscode = ""
-                        confirmPasscode = ""
-                        passcodeSuccess = true
-                        passcodeError = null
+                    val saved = sharedPrefs.getString("pref_dev_passcode", "1234") ?: "1234"
+                    when {
+                        currentPasscode != saved                                  -> passcodeError = "Current passcode is incorrect."
+                        newPasscode.length != 4 || newPasscode.any { !it.isDigit() } -> passcodeError = "New passcode must be exactly 4 digits."
+                        newPasscode != confirmPasscode                            -> passcodeError = "New passcodes do not match."
+                        else -> {
+                            sharedPrefs.edit().putString("pref_dev_passcode", newPasscode).apply()
+                            currentPasscode = ""; newPasscode = ""; confirmPasscode = ""
+                            passcodeSuccess = true; passcodeError = null
+                        }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF38BDF8)),
+                colors = ButtonDefaults.buttonColors(containerColor = primary),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Update Passcode", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text("Update Passcode", color = MaterialTheme.colorScheme.background, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -381,162 +393,103 @@ fun ResourceMonitorTab(
     listState: androidx.compose.foundation.lazy.LazyListState,
     context: Context
 ) {
+    val primary    = MaterialTheme.colorScheme.primary
+    val errorColor = MaterialTheme.colorScheme.error
     var tempSimVal by remember { mutableStateOf(24f) }
 
     fun injectSimTelemetry(stream: String) {
-        val intent = Intent("com.van.status.SIMULATE_TELEMETRY").apply {
-            putExtra("DATA_STREAM", stream)
-        }
+        val intent = Intent("com.van.status.SIMULATE_TELEMETRY").apply { putExtra("DATA_STREAM", stream) }
         context.sendBroadcast(intent)
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Raw Ingest Log Console Panel
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Raw Log Console
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(Color(0xFF020617), shape = RoundedCornerShape(12.dp))
-                .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(12.dp))
+                .border(1.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.align(Alignment.TopEnd),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier.align(Alignment.TopEnd), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = onClearLogs,
-                    modifier = Modifier
-                        .background(Color(0x13FFFFFF), shape = CircleShape)
-                        .size(36.dp)
+                    modifier = Modifier.background(errorColor.copy(alpha = 0.10f), shape = CircleShape).size(36.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Clear Logs",
-                        tint = Color(0xFFEF4444),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Clear Logs",
+                        tint = errorColor, modifier = Modifier.size(18.dp))
                 }
             }
 
             if (logs.isEmpty()) {
                 Text(
                     text = "Listening for live serial telemetry signals on USB link...\n(Use simulated panel below to mock signals)",
-                    color = Color(0xFF64748B),
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
+                    color = Color.Gray, fontFamily = FontFamily.Monospace, fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
+                LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(logs) { log ->
                         Text(
                             text = ">>> $log",
-                            color = if (log.contains("OPEN")) Color(0xFFF87171) else Color(0xFF34D399),
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 12.sp
+                            color = if (log.contains("OPEN")) errorColor else Color(0xFF34D399),
+                            fontFamily = FontFamily.Monospace, fontSize = 12.sp
                         )
                     }
                 }
             }
         }
 
-        // Simulated Signal Injector Matrix Box
+        // Simulated Signal Injector
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF1E293B).copy(alpha = 0.4f), shape = RoundedCornerShape(12.dp))
-                .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f), shape = RoundedCornerShape(12.dp))
+                .border(1.dp, primary.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "SIMULATED TELEMETRY SIGNAL INJECTOR",
-                color = Color(0xFF38BDF8),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "SIMULATED TELEMETRY SIGNAL INJECTOR", color = primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = { injectSimTelemetry("FL_OPEN") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7F1D1D)),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { injectSimTelemetry("FL_OPEN") },
+                    colors = ButtonDefaults.buttonColors(containerColor = errorColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.weight(1f), shape = RoundedCornerShape(6.dp)) {
                     Text("Mock FL Open", fontSize = 11.sp, color = Color.White)
                 }
-
-                Button(
-                    onClick = { injectSimTelemetry("FR_OPEN") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7F1D1D)),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+                Button(onClick = { injectSimTelemetry("FR_OPEN") },
+                    colors = ButtonDefaults.buttonColors(containerColor = errorColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.weight(1f), shape = RoundedCornerShape(6.dp)) {
                     Text("Mock FR Open", fontSize = 11.sp, color = Color.White)
                 }
-
-                Button(
-                    onClick = { injectSimTelemetry("RL_OPEN") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7F1D1D)),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+                Button(onClick = { injectSimTelemetry("RL_OPEN") },
+                    colors = ButtonDefaults.buttonColors(containerColor = errorColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.weight(1f), shape = RoundedCornerShape(6.dp)) {
                     Text("Mock RL Open", fontSize = 11.sp, color = Color.White)
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = { injectSimTelemetry("BACK_OPEN") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7F1D1D)),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { injectSimTelemetry("BACK_OPEN") },
+                    colors = ButtonDefaults.buttonColors(containerColor = errorColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.weight(1f), shape = RoundedCornerShape(6.dp)) {
                     Text("Mock Back Open", fontSize = 11.sp, color = Color.White)
                 }
-
-                Button(
-                    onClick = { injectSimTelemetry("FL_CLOSED|FR_CLOSED|RL_CLOSED|BACK_CLOSED") },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF065F46)),
-                    modifier = Modifier.weight(2f),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
+                Button(onClick = { injectSimTelemetry("FL_CLOSED|FR_CLOSED|RL_CLOSED|BACK_CLOSED") },
+                    colors = ButtonDefaults.buttonColors(containerColor = primary.copy(alpha = 0.6f)),
+                    modifier = Modifier.weight(2f), shape = RoundedCornerShape(6.dp)) {
                     Text("Mock All Closed (Secure State)", fontSize = 11.sp, color = Color.White)
                 }
             }
 
-            // Temp mock slider
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Mock Temperature Shift: ${tempSimVal.toInt()}°C",
-                    color = Color.LightGray,
-                    fontSize = 11.sp
-                )
+                Text(text = "Mock Temperature Shift: ${tempSimVal.toInt()}\u00b0C", color = Color.LightGray, fontSize = 11.sp)
                 Slider(
                     value = tempSimVal,
-                    onValueChange = { newValue ->
-                        tempSimVal = newValue
-                        injectSimTelemetry("TEMP:${newValue.toInt()}")
-                    },
+                    onValueChange = { newValue -> tempSimVal = newValue; injectSimTelemetry("TEMP:${newValue.toInt()}") },
                     valueRange = 10f..50f,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFF38BDF8),
-                        activeTrackColor = Color(0xFF38BDF8)
-                    )
+                    colors = SliderDefaults.colors(thumbColor = primary, activeTrackColor = primary)
                 )
             }
         }
