@@ -36,13 +36,15 @@ fun VanStatusScreen(
     isFrOpen: Boolean,
     isRlOpen: Boolean,
     isRrOpen: Boolean,
+    isBackOpen: Boolean,
     cabinTemperature: Int,
     isBuzzerEnabled: Boolean,
     onToggleBuzzer: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "Blinking Alert Animations")
-    
+    val vehicleType by VehicleStatusManager.selectedVehicleType.collectAsState()
+
     // alertAlpha: Animate linearly from 0.2f to 1.0f inside a quick 400ms cycle for warnings
     val alertAlpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
@@ -54,49 +56,29 @@ fun VanStatusScreen(
         label = "Rapid Alert Alpha"
     )
 
-    // Anchor variable initialized to 0 to capture the launch roll-up effect
     var currentTemperatureTarget by remember { mutableStateOf(0) }
+    LaunchedEffect(cabinTemperature) { currentTemperatureTarget = cabinTemperature }
 
-    // Listen for incoming telemetry updates to advance the target forward
-    LaunchedEffect(cabinTemperature) {
-        currentTemperatureTarget = cabinTemperature
-    }
-
-    // rolling temperature transition animation
     val animatedTemperature by animateIntAsState(
         targetValue = currentTemperatureTarget,
-        animationSpec = tween(
-            durationMillis = 1000,
-            easing = FastOutSlowInEasing
-        ),
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
         label = "Temperature Roll Animation"
     )
 
-    // Staggered Entrance Animations: triggered on initialization
     var startEntranceAnimation by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        startEntranceAnimation = true
-    }
+    LaunchedEffect(Unit) { startEntranceAnimation = true }
 
-    // 1. Base chassis scale & alpha (instantly on launch)
     val baseScale by animateFloatAsState(
         targetValue = if (startEntranceAnimation) 1f else 0.85f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
         label = "Base Scale"
     )
     val baseAlpha by animateFloatAsState(
         targetValue = if (startEntranceAnimation) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
         label = "Base Alpha"
     )
 
-    // 2. Doors scale & alpha (staggered with a 150ms delay)
     var startDoorsEntranceAnimation by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(150)
@@ -105,22 +87,16 @@ fun VanStatusScreen(
 
     val doorsScale by animateFloatAsState(
         targetValue = if (startDoorsEntranceAnimation) 1f else 0.85f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
         label = "Doors Scale"
     )
     val doorsAlpha by animateFloatAsState(
         targetValue = if (startDoorsEntranceAnimation) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
         label = "Doors Alpha"
     )
 
-    // Base Inversion Matrix: White background -> Black, dark lines -> Cyber white/gray lines
+    // Base Inversion Matrix
     val invertMatrix = remember {
         ColorMatrix(floatArrayOf(
             -1f,  0f,  0f, 0f, 255f,
@@ -130,39 +106,39 @@ fun VanStatusScreen(
         ))
     }
 
-    val alertColor = MaterialTheme.colorScheme.error
-    val redVal = alertColor.red * 255f
-    val greenVal = alertColor.green * 255f
-    val blueVal = alertColor.blue * 255f
+    val darkSuvMatrix = remember {
+        ColorMatrix(floatArrayOf(
+            -0.25f,  0f,     0f,   0f,  255f * 0.25f,
+              0f,    -0.25f,  0f,   0f,  255f * 0.25f,
+              0f,     0f,    -0.25f,0f,  255f * 0.25f,
+              0f,     0f,     0f,   1f,    0f
+        ))
+    }
 
-    // Red Glow Matrix: White background -> Black, dark lines -> Dynamic Alert Color
+    val alertColor = MaterialTheme.colorScheme.error
+    val redVal   = alertColor.red   * 255f
+    val greenVal = alertColor.green * 255f
+    val blueVal  = alertColor.blue  * 255f
+
     val redGlowMatrix = remember(alertColor) {
         ColorMatrix(floatArrayOf(
-            -1f,  0f,  0f, 0f, redVal, // Red
-             0f,  0f,  0f, 0f, greenVal, // Green
-             0f,  0f,  0f, 0f, blueVal, // Blue
-             0f,  0f,  0f, 1f,   0f  // Alpha
+            -1f, 0f, 0f, 0f, redVal,
+             0f, 0f, 0f, 0f, greenVal,
+             0f, 0f, 0f, 0f, blueVal,
+             0f, 0f, 0f, 1f, 0f
         ))
     }
 
-    // Crimson Mesh Matrix: White background -> Black, dark lines -> Dynamic Alert Color
     val crimsonMeshMatrix = remember(alertColor) {
         ColorMatrix(floatArrayOf(
-            -(redVal / 255f),  0f,  0f, 0f, redVal,
-              0f,             0f,  0f, 0f, greenVal,
-              0f,             0f,  0f, 0f, blueVal,
-              0f,             0f,  0f, 1f,   0f
+            -(redVal / 255f), 0f, 0f, 0f, redVal,
+              0f,             0f, 0f, 0f, greenVal,
+              0f,             0f, 0f, 0f, blueVal,
+              0f,             0f, 0f, 1f, 0f
         ))
     }
 
-    // Load the 3D local image bitmaps
-    val baseImage = ImageBitmap.imageResource(id = R.drawable.base)
-    val flClosedImage = ImageBitmap.imageResource(id = R.drawable.front_left_closed)
-    val flOpenImage = ImageBitmap.imageResource(id = R.drawable.front_left_open)
-    val frOpenImage = ImageBitmap.imageResource(id = R.drawable.front_right_open)
-    val rlClosedImage = ImageBitmap.imageResource(id = R.drawable.rear_left_closed)
-    val rlOpenImage = ImageBitmap.imageResource(id = R.drawable.rear_left_open)
-    val backOpenImage = ImageBitmap.imageResource(id = R.drawable.back_open)
+    val isSuv = (vehicleType == VehicleType.SUV_5_DOOR)
 
     Box(
         modifier = Modifier
@@ -171,10 +147,8 @@ fun VanStatusScreen(
                 brush = Brush.radialGradient(
                     colors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.background)
                 )
-            ) // Minimal slate gray to absolute black gradient core directly behind the van
+            )
     ) {
-        
-        // (Floor grid entirely removed from background overlays)
 
         // 1. Dial and Chassis Stack Area
         Box(
@@ -183,231 +157,223 @@ fun VanStatusScreen(
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Dial Graphic Layer
             Image(
                 painter = painterResource(id = R.drawable.ui_circular_dial),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Central 3D Chassis stack box
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .fillMaxHeight(),
                 contentAlignment = Alignment.Center
             ) {
-                // Base chassis foundation wireframe Canvas
-                Canvas(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = baseScale
-                            scaleY = baseScale
-                            alpha = baseAlpha
+                if (isSuv) {
+                    // ─── FORCE EXCLUSIVE LOADING OF SUV GRAPHICS ───
+                    val suvBaseImg = ImageBitmap.imageResource(id = R.drawable.suv_base)
+                    
+                    val suvFlImg   = ImageBitmap.imageResource(id = if (isFlOpen) R.drawable.suv_fl_open   else R.drawable.suv_fl_closed)
+                    val suvFrImg   = ImageBitmap.imageResource(id = if (isFrOpen) R.drawable.suv_fr_open   else R.drawable.suv_fr_closed)
+                    val suvRlImg   = ImageBitmap.imageResource(id = if (isRlOpen) R.drawable.suv_rl_open   else R.drawable.suv_rl_closed)
+                    val suvRrImg   = ImageBitmap.imageResource(id = if (isRrOpen) R.drawable.suv_rr_open   else R.drawable.suv_rr_closed)
+                    val suvBackImg = ImageBitmap.imageResource(id = if (isBackOpen) R.drawable.suv_back_open else R.drawable.suv_back_closed)
+
+                    // 1. Base Chassis
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer { scaleX = baseScale; scaleY = baseScale; alpha = baseAlpha }
+                    ) {
+                        drawImage(
+                            image = suvBaseImg,
+                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                            colorFilter = ColorFilter.colorMatrix(darkSuvMatrix),
+                            blendMode = BlendMode.Screen
+                        )
+                    }
+
+                    // 2. FL Door
+                    if (isFlOpen) {
+                        Canvas(modifier = Modifier.fillMaxSize().blur(8.dp).graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }) {
+                            drawImage(image = suvFlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
                         }
-                ) {
-                    drawImage(
-                        image = baseImage,
-                        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                        colorFilter = ColorFilter.colorMatrix(invertMatrix),
-                        blendMode = BlendMode.Screen
-                    )
-                }
-
-                // --- FRONT LEFT DOOR (FL) ---
-                if (isFlOpen) {
-                    // Sub-Layer A: Aura Glow
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .blur(8.dp)
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * 0.6f
-                            }
-                    ) {
-                        drawImage(
-                            image = flOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(redGlowMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }) {
+                            drawImage(image = suvFlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }) {
+                            drawImage(image = suvFlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(darkSuvMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
-                    // Sub-Layer B: Blinking Mesh Line Overlay
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * alertAlpha
-                            }
-                    ) {
-                        drawImage(
-                            image = flOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+
+                    // 3. FR Door
+                    if (isFrOpen) {
+                        Canvas(modifier = Modifier.fillMaxSize().blur(8.dp).graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }) {
+                            drawImage(image = suvFrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }) {
+                            drawImage(image = suvFrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }) {
+                            drawImage(image = suvFrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(darkSuvMatrix), blendMode = BlendMode.Screen)
+                        }
+                    }
+
+                    // 4. RL Door
+                    if (isRlOpen) {
+                        Canvas(modifier = Modifier.fillMaxSize().blur(8.dp).graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }) {
+                            drawImage(image = suvRlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }) {
+                            drawImage(image = suvRlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }) {
+                            drawImage(image = suvRlImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(darkSuvMatrix), blendMode = BlendMode.Screen)
+                        }
+                    }
+
+                    // 5. RR Door
+                    if (isRrOpen) {
+                        Canvas(modifier = Modifier.fillMaxSize().blur(8.dp).graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }) {
+                            drawImage(image = suvRrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }) {
+                            drawImage(image = suvRrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }) {
+                            drawImage(image = suvRrImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(darkSuvMatrix), blendMode = BlendMode.Screen)
+                        }
+                    }
+
+                    // 6. BACK Door
+                    if (isBackOpen) {
+                        Canvas(modifier = Modifier.fillMaxSize().blur(8.dp).graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }) {
+                            drawImage(image = suvBackImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }) {
+                            drawImage(image = suvBackImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }) {
+                            drawImage(image = suvBackImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()), colorFilter = ColorFilter.colorMatrix(darkSuvMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
                 } else {
-                    // Closed State Canvas layer
+                    // ─── LEGACY VAN DRAWING PATH ───
+                    val baseImage = ImageBitmap.imageResource(id = R.drawable.base)
+                    val flOpenImg = ImageBitmap.imageResource(id = R.drawable.front_left_open)
+                    val flClosedImg = ImageBitmap.imageResource(id = R.drawable.front_left_closed)
+                    val frOpenImg = ImageBitmap.imageResource(id = R.drawable.front_right_open)
+                    val rlOpenImg = ImageBitmap.imageResource(id = R.drawable.rear_left_open)
+                    val rlClosedImg = ImageBitmap.imageResource(id = R.drawable.rear_left_closed)
+                    val backOpenImg = ImageBitmap.imageResource(id = R.drawable.back_open)
+
+                    // Base chassis foundation wireframe
                     Canvas(
                         modifier = Modifier
                             .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha
-                            }
+                            .graphicsLayer { scaleX = baseScale; scaleY = baseScale; alpha = baseAlpha }
                     ) {
                         drawImage(
-                            image = flClosedImage,
+                            image = baseImage,
                             dstSize = IntSize(size.width.toInt(), size.height.toInt()),
                             colorFilter = ColorFilter.colorMatrix(invertMatrix),
                             blendMode = BlendMode.Screen
                         )
                     }
-                }
 
-                // --- FRONT RIGHT DOOR (FR) ---
-                if (isFrOpen) {
-                    // Sub-Layer A: Aura Glow
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .blur(8.dp)
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * 0.6f
-                            }
-                    ) {
-                        drawImage(
-                            image = frOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(redGlowMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+                    // --- FRONT LEFT DOOR (FL) ---
+                    if (isFlOpen) {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize().blur(8.dp)
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }
+                        ) {
+                            drawImage(image = flOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }
+                        ) {
+                            drawImage(image = flOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }
+                        ) {
+                            drawImage(image = flClosedImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(invertMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
-                    // Sub-Layer B: Blinking Mesh Line Overlay
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * alertAlpha
-                            }
-                    ) {
-                        drawImage(
-                            image = frOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix),
-                            blendMode = BlendMode.Screen
-                        )
-                    }
-                }
-                // (If closed, it lets BASE show through natively)
 
-                // --- REAR LEFT DOOR (RL) ---
-                if (isRlOpen) {
-                    // Sub-Layer A: Aura Glow
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .blur(8.dp)
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * 0.6f
-                            }
-                    ) {
-                        drawImage(
-                            image = rlOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(redGlowMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+                    // --- FRONT RIGHT DOOR (FR) ---
+                    if (isFrOpen) {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize().blur(8.dp)
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }
+                        ) {
+                            drawImage(image = frOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }
+                        ) {
+                            drawImage(image = frOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
-                    // Sub-Layer B: Blinking Mesh Line Overlay
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * alertAlpha
-                            }
-                    ) {
-                        drawImage(
-                            image = rlOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix),
-                            blendMode = BlendMode.Screen
-                        )
-                    }
-                } else {
-                    // Closed State Canvas layer
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha
-                            }
-                    ) {
-                        drawImage(
-                            image = rlClosedImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(invertMatrix),
-                            blendMode = BlendMode.Screen
-                        )
-                    }
-                }
 
-                // --- REAR RIGHT / BACK DOOR (RR) ---
-                if (isRrOpen) {
-                    // Sub-Layer A: Aura Glow
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .blur(8.dp)
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * 0.6f
-                            }
-                    ) {
-                        drawImage(
-                            image = backOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(redGlowMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+                    // --- REAR LEFT DOOR (RL) ---
+                    if (isRlOpen) {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize().blur(8.dp)
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }
+                        ) {
+                            drawImage(image = rlOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }
+                        ) {
+                            drawImage(image = rlOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
+                    } else {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha }
+                        ) {
+                            drawImage(image = rlClosedImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(invertMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
-                    // Sub-Layer B: Blinking Mesh Line Overlay
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = doorsScale
-                                scaleY = doorsScale
-                                alpha = doorsAlpha * alertAlpha
-                            }
-                    ) {
-                        drawImage(
-                            image = backOpenImage,
-                            dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                            colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix),
-                            blendMode = BlendMode.Screen
-                        )
+
+                    // --- BACK DOOR (BACK / TAILGATE) ---
+                    if (isBackOpen) {
+                        Canvas(
+                            modifier = Modifier.fillMaxSize().blur(8.dp)
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * 0.6f }
+                        ) {
+                            drawImage(image = backOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(redGlowMatrix), blendMode = BlendMode.Screen)
+                        }
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                                .graphicsLayer { scaleX = doorsScale; scaleY = doorsScale; alpha = doorsAlpha * alertAlpha }
+                        ) {
+                            drawImage(image = backOpenImg, dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                                colorFilter = ColorFilter.colorMatrix(crimsonMeshMatrix), blendMode = BlendMode.Screen)
+                        }
                     }
                 }
-                // (If closed, it lets BASE show through natively)
             }
         }
 
@@ -416,15 +382,8 @@ fun VanStatusScreen(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(24.dp)
-                .background(
-                    color = Color.White.copy(alpha = 0.03f),
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = Color.White.copy(alpha = 0.08f),
-                    shape = RoundedCornerShape(12.dp)
-                )
+                .background(color = Color.White.copy(alpha = 0.03f), shape = RoundedCornerShape(12.dp))
+                .border(width = 1.dp, color = Color.White.copy(alpha = 0.08f), shape = RoundedCornerShape(12.dp))
                 .padding(16.dp)
         ) {
             Row(
@@ -438,7 +397,7 @@ fun VanStatusScreen(
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = "$animatedTemperature °C",
+                    text = "$animatedTemperature \u00b0C",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -446,13 +405,13 @@ fun VanStatusScreen(
             }
         }
 
-        // 3. Interactive Control Overlay: Floating Top-Right Corner Volume Toggle Button
+        // 3. Buzzer Toggle Button (Top-Right)
         IconButton(
             onClick = onToggleBuzzer,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(24.dp)
-                .background(Color(0x13FFFFFF), shape = CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), shape = CircleShape)
                 .size(48.dp)
         ) {
             Icon(
@@ -460,24 +419,24 @@ fun VanStatusScreen(
                     id = if (isBuzzerEnabled) R.drawable.ic_volume_up else R.drawable.ic_volume_off
                 ),
                 contentDescription = "Toggle Audio Warnings",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
         }
 
-        // Floating Top-Left Corner Settings Button
+        // 4. Settings Button (Top-Left)
         IconButton(
             onClick = onNavigateToSettings,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(24.dp)
-                .background(Color(0x13FFFFFF), shape = CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), shape = CircleShape)
                 .size(48.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "System Settings",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -489,18 +448,18 @@ fun VanStatusTheme(content: @Composable () -> Unit) {
     val themeIndex by VehicleStatusManager.selectedThemeIndex.collectAsState()
     val colorScheme = if (themeIndex >= VehicleStatusManager.ThemePalettes.size) {
         // Custom user palette
-        val primary by VehicleStatusManager.customPrimaryColor.collectAsState()
-        val alert by VehicleStatusManager.customAlertColor.collectAsState()
-        val bg by VehicleStatusManager.customBackgroundColor.collectAsState()
-        val surface by VehicleStatusManager.customSurfaceColor.collectAsState()
+        val primary  by VehicleStatusManager.customPrimaryColor.collectAsState()
+        val alert    by VehicleStatusManager.customAlertColor.collectAsState()
+        val bg       by VehicleStatusManager.customBackgroundColor.collectAsState()
+        val surface  by VehicleStatusManager.customSurfaceColor.collectAsState()
         darkColorScheme(primary = primary, background = bg, surface = surface, error = alert)
     } else {
         val theme = VehicleStatusManager.ThemePalettes[themeIndex]
         darkColorScheme(
-            primary = theme.primaryColor,
+            primary    = theme.primaryColor,
             background = theme.backgroundColor,
-            surface = theme.surfaceColor,
-            error = theme.alertColor
+            surface    = theme.surfaceColor,
+            error      = theme.alertColor
         )
     }
     MaterialTheme(colorScheme = colorScheme, content = content)

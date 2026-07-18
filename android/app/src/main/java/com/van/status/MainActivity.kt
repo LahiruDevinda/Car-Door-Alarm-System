@@ -104,21 +104,30 @@ class MainActivity : ComponentActivity() {
                 VehicleStatusManager.setCustomSurfaceColor(
                     androidx.compose.ui.graphics.Color(sharedPrefs.getInt("custom_surface_color", 0xFF1E293B.toInt()))
                 )
+                // Load vehicle profile
+                val vehicleTypeStr = sharedPrefs.getString("pref_vehicle_type", "VAN") ?: "VAN"
+                VehicleStatusManager.setVehicleType(
+                    if (vehicleTypeStr == "SUV_5_DOOR") VehicleType.SUV_5_DOOR else VehicleType.VAN
+                )
             }
 
             VanStatusTheme {
+
+                val vehicleType by VehicleStatusManager.selectedVehicleType.collectAsState()
 
                 // Persistent preference states
                 var flEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_fl_enabled", true)) }
                 var frEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_fr_enabled", true)) }
                 var rlEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_rl_enabled", true)) }
+                var rrEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_rr_enabled", true)) }
                 var backEnabled by remember { mutableStateOf(sharedPrefs.getBoolean("pref_back_enabled", true)) }
                 var chimeSelection by remember { mutableStateOf(sharedPrefs.getString("pref_chime_selection", "audi_chime") ?: "audi_chime") }
 
                 val isFlOpen by VehicleStatusManager.isFlOpen.collectAsState()
                 val isFrOpen by VehicleStatusManager.isFrOpen.collectAsState()
                 val isRlOpen by VehicleStatusManager.isRlOpen.collectAsState()
-                val isRrOpen by VehicleStatusManager.isBackOpen.collectAsState()
+                val isRrOpen by VehicleStatusManager.isRrOpen.collectAsState()
+                val isBackOpen by VehicleStatusManager.isBackOpen.collectAsState()
                 val isBuzzerEnabled by VehicleStatusManager.isBuzzerEnabled.collectAsState()
                 val cabinTemperature by VehicleStatusManager.cabinTemperature.collectAsState()
                 val diagnosticLogs by VehicleStatusManager.diagnosticLogs.collectAsState()
@@ -130,7 +139,8 @@ class MainActivity : ComponentActivity() {
                 val isAnyActiveDoorOpen = (isFlOpen && flEnabled) ||
                                           (isFrOpen && frEnabled) ||
                                           (isRlOpen && rlEnabled) ||
-                                          (isRrOpen && backEnabled)
+                                          (vehicleType == VehicleType.SUV_5_DOOR && isRrOpen && rrEnabled) ||
+                                          (isBackOpen && backEnabled)
 
                 // Screen Timeout Prevention: Keep LCD display awake while an active alarm event triggers
                 LaunchedEffect(isAnyActiveDoorOpen) {
@@ -152,6 +162,7 @@ class MainActivity : ComponentActivity() {
                         flEnabled = flEnabled,
                         frEnabled = frEnabled,
                         rlEnabled = rlEnabled,
+                        rrEnabled = rrEnabled,
                         backEnabled = backEnabled,
                         chimeSelection = chimeSelection,
                         onToggleFl = { enabled ->
@@ -165,6 +176,10 @@ class MainActivity : ComponentActivity() {
                         onToggleRl = { enabled ->
                             rlEnabled = enabled
                             sharedPrefs.edit().putBoolean("pref_rl_enabled", enabled).apply()
+                        },
+                        onToggleRr = { enabled ->
+                            rrEnabled = enabled
+                            sharedPrefs.edit().putBoolean("pref_rr_enabled", enabled).apply()
                         },
                         onToggleBack = { enabled ->
                             backEnabled = enabled
@@ -182,7 +197,8 @@ class MainActivity : ComponentActivity() {
                         isFlOpen = isFlOpen && flEnabled,
                         isFrOpen = isFrOpen && frEnabled,
                         isRlOpen = isRlOpen && rlEnabled,
-                        isRrOpen = isRrOpen && backEnabled,
+                        isRrOpen = if (vehicleType == VehicleType.VAN) false else (isRrOpen && rrEnabled),
+                        isBackOpen = isBackOpen && backEnabled,
                         cabinTemperature = cabinTemperature,
                         isBuzzerEnabled = isBuzzerEnabled,
                         onToggleBuzzer = { VehicleStatusManager.setBuzzerEnabled(!isBuzzerEnabled) },
