@@ -1,92 +1,160 @@
 /*
- * Van Status Telemetry System Arduino Firmware - One-By-One Streaming
+ * Van Status Telemetry System Arduino Firmware - Direct 1-Wire Skip ROM Protocol
+ * 
  * Monitored Pins:
- * - D2: Front Left (FL) 
- * - D3: Front Right (FR) 
- * - D4: Rear Left (RL) 
- * - D5: Back Hatch (BACK) 
- * - A1: Cabin Temperature Sensor (LM35/TMP36) 
- * * Logic: Negative-switching (LOW = OPEN, HIGH = CLOSED).
- * Telemetry Broadcast Interval: 1000ms [cite: 2]
+ * - D2: Front Left Door (FL)
+ * - D3: Front Right Door (FR)
+ * - D4: Rear Left Door (RL)
+ * - D5: Back Hatch (BACK)
+ * - D7: DS18B20 Digital Temperature Sensor (1-Wire Data Pin)
+ * 
+ * Hardware Requirements:
+ * - Red Wire  -> 5V Pin on Arduino
+ * - Black Wire -> GND Pin
+ * - Yellow Wire -> Pin D7
+ * - Resistors -> 3x 1k0 in series (3k0 total) between 5V and Pin D7
+ * 
+ * Logic: Negative-switching for doors (LOW = OPEN, HIGH = CLOSED).
+ * Telemetry Broadcast Interval: 1000ms
  */
 
-#define PIN_FL 2 // [cite: 3]
-#define PIN_FR 3 // [cite: 3]
-#define PIN_RL 4 // [cite: 3]
-#define PIN_BACK 5 // [cite: 3]
-#define TEMP_PIN A1 // [cite: 3]
+#include <OneWire.h>
 
-const int NUM_DOORS = 4; // [cite: 3]
-const int doorPins[NUM_DOORS] = {PIN_FL, PIN_FR, PIN_RL, PIN_BACK}; // [cite: 3]
-const char* doorNames[NUM_DOORS] = {"FL", "FR", "RL", "BACK"}; // [cite: 3]
+#define PIN_FL 2
+#define PIN_FR 3
+#define PIN_RL 4
+#define PIN_RR 5
+#define PIN_BACK 6
+#define ONE_WIRE_BUS 7 // Pin D7 connected to DS18B20 DATA wire
 
-int lastStableState[NUM_DOORS]; // [cite: 4]
-int lastReadState[NUM_DOORS]; // [cite: 4]
-unsigned long lastDebounceTime[NUM_DOORS]; // [cite: 4]
-const unsigned long DEBOUNCE_DELAY = 40; // 40ms debounce limit [cite: 4]
+// Door pin setup
+const int NUM_DOORS = 5;
+const int doorPins[NUM_DOORS] = {PIN_FL, PIN_FR, PIN_RL,PIN_RR ,PIN_BACK};
+const char* doorNames[NUM_DOORS] = {"FL", "FR", "RL","RR", "BACK"};
 
-unsigned long lastTelemetryTime = 0; // [cite: 5]
-const unsigned long TELEMETRY_INTERVAL = 1000; // Stream full state every 1 second [cite: 5]
+// State tracking arrays for non-blocking debouncing
+int lastStableState[NUM_DOORS];
+int lastReadState[NUM_DOORS];
+unsigned long lastDebounceTime[NUM_DOORS];
+const unsigned long DEBOUNCE_DELAY = 40; // 40ms non-blocking debounce threshold
+
+// Telemetry timing
+unsigned long lastTelemetryTime = 0;
+const unsigned long TELEMETRY_INTERVAL = 1000; // Stream state every 1 second
+
+// Initialize raw OneWire instance on Pin D7
+OneWire ds(ONE_WIRE_BUS);
 
 void setup() {
-  Serial.begin(9600); // [cite: 6]
-  
-  for (int i = 0; i < NUM_DOORS; i++) { // [cite: 6]
-    pinMode(doorPins[i], INPUT_PULLUP); // [cite: 6]
+  Serial.begin(9600);
+
+  // Enable internal pull-up resistor on Pin D7 as additional safety
+  pinMode(ONE_WIRE_BUS, INPUT_PULLUP);
+
+  // Initialize door pins with internal pull-up resistors
+  for (int i = 0; i < NUM_DOORS; i++) {
+    pinMode(doorPins[i], INPUT_PULLUP);
     
-    int state = digitalRead(doorPins[i]); // [cite: 6]
-    lastStableState[i] = state; // [cite: 7]
-    lastReadState[i] = state; // [cite: 7]
-    lastDebounceTime[i] = 0; // [cite: 7]
+    int state = digitalRead(doorPins[i]);
+    lastStableState[i] = state;
+    lastReadState[i] = state;
+    lastDebounceTime[i] = 0;
   }
 }
 
 void loop() {
-  unsigned long now = millis(); // [cite: 8]
-  bool stateChanged = false; // [cite: 8]
-  
-  // 1. Process Non-Blocking Debounce for Pin State Changes
-  for (int i = 0; i < NUM_DOORS; i++) { // [cite: 8]
-    int reading = digitalRead(doorPins[i]); // [cite: 8]
-    
-    if (reading != lastReadState[i]) { // [cite: 9]
-      lastDebounceTime[i] = now; // [cite: 9]
-      lastReadState[i] = reading; // [cite: 9]
-    } // [cite: 10]
-    
-    if ((now - lastDebounceTime[i]) >= DEBOUNCE_DELAY) { // [cite: 10]
-      if (reading != lastStableState[i]) { // [cite: 10]
-        lastStableState[i] = reading; // [cite: 10]
-        stateChanged = true; // Trigger immediate broadcast on state change [cite: 11]
+  unsigned long now = millis();
+  bool stateChanged = false;
+
+  // 1. Non-Blocking Debounce for Door Sensors
+  for (int i = 0; i < NUM_DOORS; i++) {
+    int reading = digitalRead(doorPins[i]);
+
+    // Reset debounce timer on edge transition
+    if (reading != lastReadState[i]) {
+      lastDebounceTime[i] = now;
+      lastReadState[i] = reading;
+    }
+
+    // Confirm state change after stable duration
+    if ((now - lastDebounceTime[i]) >= DEBOUNCE_DELAY) {
+      if (reading != lastStableState[i]) {
+        lastStableState[i] = reading;
+        stateChanged = true; // Trigger immediate telemetry broadcast
       }
     }
   }
 
-  // 2. Broadcast Telemetry (On Interval OR Instant State Change)
-  if (stateChanged || (now - lastTelemetryTime >= TELEMETRY_INTERVAL)) { // [cite: 11]
+  // 2. Broadcast Telemetry (On instant state change OR 1000ms periodic interval)
+  if (stateChanged || (now - lastTelemetryTime >= TELEMETRY_INTERVAL)) {
     broadcastTelemetry();
-    lastTelemetryTime = now; // [cite: 12]
+    lastTelemetryTime = now;
   }
 }
 
-void broadcastTelemetry() {
-  // Read and calculate Temperature
-  int tempRaw = analogRead(TEMP_PIN); // [cite: 12]
-  float voltageTemp = (tempRaw * 5.0) / 1023.0; // [cite: 13]
-  float tempC = (voltageTemp - 0.5) * 100.0; // [cite: 13]
+int readDS18B20SkipROM() {
+  byte data[9];
+
+  // Step 1: Issue presence reset on 1-Wire bus
+  if (!ds.reset()) {
+    return -127; // Sensor not responding (Presence pulse missing)
+  }
+
+  // Step 2: Send Skip ROM command (0xCC) - Targets single attached sensor without address scanning
+  ds.write(0xCC);
   
-  // Stream each door state on its own clean line
-  for (int i = 0; i < NUM_DOORS; i++) { // [cite: 15]
-    Serial.print("DATA_STREAM:"); // Prefix keeps it compatible with your service
-    Serial.print(doorNames[i]); // [cite: 15]
-    if (lastStableState[i] == LOW) { // [cite: 16]
-      Serial.println("_OPEN"); // Ends the line immediately
+  // Step 3: Send Convert Temperature command (0x44)
+  ds.write(0x44, 1);
+
+  // Allow time for 12-bit ADC conversion (750ms)
+  delay(750);
+
+  // Step 4: Issue second reset to read conversion result
+  if (!ds.reset()) {
+    return -127; // Lost sensor during conversion
+  }
+
+  // Step 5: Send Skip ROM (0xCC) followed by Read Scratchpad (0xBE)
+  ds.write(0xCC);
+  ds.write(0xBE);
+
+  // Read 9 bytes of scratchpad RAM
+  for (int i = 0; i < 9; i++) {
+    data[i] = ds.read();
+  }
+
+  // Step 6: Validate CRC checksum on data packet
+  if (OneWire::crc8(data, 8) != data[8]) {
+    return -127; // Transmission checksum error
+  }
+
+  // Step 7: Calculate temperature in Celsius from raw bytes
+  int16_t raw = (data[1] << 8) | data[0];
+  byte cfg = (data[4] & 0x60);
+  if (cfg == 0x00) raw = raw & ~7;       // 9-bit resolution
+  else if (cfg == 0x20) raw = raw & ~3;  // 10-bit resolution
+  else if (cfg == 0x40) raw = raw & ~1;  // 11-bit resolution
+
+  float celsius = (float)raw / 16.0;
+  return (int)celsius;
+}
+
+void broadcastTelemetry() {
+  // Read temperature directly using 1-Wire Skip ROM protocol
+  int tempC = readDS18B20SkipROM();
+
+  // Stream each door status on its own clean line
+  for (int i = 0; i < NUM_DOORS; i++) {
+    Serial.print("DATA_STREAM:");
+    Serial.print(doorNames[i]);
+    if (lastStableState[i] == LOW) {
+      Serial.println("_OPEN");
     } else {
-      Serial.println("_CLOSED"); // Ends the line immediately [cite: 16]
+      Serial.println("_CLOSED");
     }
   }
-  
-  // Stream the temperature on its own clean line
+
+  // Stream digital DS18B20 temperature on its own clean line
   Serial.print("DATA_STREAM:TEMP:");
-  Serial.println((int)tempC);
+  Serial.println(tempC);
 }
